@@ -23,6 +23,10 @@
 https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 
 ## 분석/설계
+### AS-IS 조직 (Horizontally-Aligned)
+![image](https://user-images.githubusercontent.com/16534043/106468971-f7a2e880-64e1-11eb-9e3e-faf334166094.png)
+### TO-BE 조직 (Vertically-Aligned)
+![image](https://user-images.githubusercontent.com/16534043/106469623-de4e6c00-64e2-11eb-9c5d-bd3d43fa6340.png)
 ### EventStorming 결과
 <img src="./images/2021-01-31 155439.png" />
 
