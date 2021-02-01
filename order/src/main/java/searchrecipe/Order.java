@@ -35,8 +35,7 @@ public class Order {
 
         searchrecipe.external.Cancellation cancellation = new searchrecipe.external.Cancellation();
         // mappings goes here
-        OrderApplication.applicationContext.getBean(searchrecipe.external.CancellationService.class)
-            .cancel(cancellation);
+        OrderApplication.applicationContext.getBean(searchrecipe.external.CancellationService.class).cancel(cancellation);
 
 
     }
