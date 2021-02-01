@@ -28,19 +28,75 @@ https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 ### TO-BE 조직 (Vertically-Aligned)
 ![image](https://user-images.githubusercontent.com/16534043/106469623-de4e6c00-64e2-11eb-9c5d-bd3d43fa6340.png)
 ### EventStorming 결과
+#### 이벤트 도출
+#### 부적격 이벤트 탈락
+#### 폴리시 부착
+#### 액터, 커맨드 부착하여 읽기 좋게
+#### 어그리게잇으로 묶기
+#### 바운디드 컨텍스트로 묶기
+#### 폴리시의 이동과 컨텍스트 매핑 (점선은 Pub/Sub , 실선은 Req/Res)
+#### 완성된 1차 모형
 <img src="./images/2021-01-31 155439.png" />
-
-### 헥사고날 아키텍쳐
+#### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
+### 헥사고날 아키텍쳐 다이어그램 도출 (Polyglot)
 
 ## 구현
-### DDD 의 구현
+분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트와 파이선으로 구현하였다. 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 808n 이다)
+...
+cd recipe
+mvn spring-boot:run  
+
+cd order
+mvn spring-boot:run
+
+cd delivery
+mvn spring-boot:run 
+
+cd mypage
+mvn spring-boot:run  
+
+cd gateway
+mvn spring-boot:run  
+...
+
+### DDD 의 적용
+각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다. (아래 예시는 order 마이크로 서비스)
+이 서비스 조직의 특이성으로 현업에서도 영어를 사용하기에, 영어를 그대로 사용하려고 노력했다. (유비쿼터스 랭귀지)
+일부 구현에 있어서 영문이 아닌 경우는 실행이 불가능한 경우가 있기 때문에, 향후에도 영문으로 유비쿼터스 랭귀지를 유지하고자 한다.
+(Maven pom.xml, Kafka의 topic id, FeignClient 의 서비스 id 등은 한글로 식별자를 사용하는 경우 오류가 발생하는 것을 확인하였다)
+...
+order 마이크로 서비스 관련 코드 넣기
+...
+Entity Pattern 과 Repository Pattern 을 적용하여 JPA 를 통하여 다양한 데이터소스 유형 (RDB or NoSQL) 에 대한 별도의 처리가 없도록 데이터 접근 어댑터를 자동 생성하기 위하여 Spring Data REST 의 RestRepository 를 적용하였다
+...
+소스 넣기
+...
+적용 후 REST API의 테스트
+...
+테스트 결과 
+...
+
 ### Gateway 적용
-### Gateway 인증
+API Gateway를 통하여 마이크로 서비스들의 진입점을 통일하였다.
+...
+gateway > application.yaml 파일 소스
+...
+
+
 ### 폴리그랏 퍼시스턴스
-- h2db, hsqldb
+- recipe의 경우, 다른 마이크로 서비스들과 달리 조회 기능도 제공해야 하기에, HSQL을 사용하여 구현하였다. 이를 통해, 마이크로 서비스 간 서로 다른 종류의 데이터베이스를 사용해도 문제 없이 동작하여 폴리그랏 퍼시스턴스를 충족시켰다.
+...
+recipe에 h2sql을 넣어서 할 수 있도록 수정 필요
+...
+
 ### 유비쿼터스 랭귀지
 - 조직명, 서비스 명에서 사용되고, 업무현장에서도 쓰이며, 모든 이해관계자들이 직관적으로 의미를 이해할 수 있도록 영어 단어를 사용함 (recipe, order, delivery 등)
+
 ### 동기식 호출과 Fallback 처리
+분석단계에서의 조건 중 하나로 주문 취소(order)와 배송 취소(delivery) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다.
+- 
+
+
 ### 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
 ### CQRS
 
