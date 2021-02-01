@@ -5,7 +5,7 @@ public class MaterialOrdered extends AbstractEvent {
 
     private Long id;
     private String materialNm;
-    private String qty;
+    private Integer qty;
 
     public Long getId() {
         return id;
@@ -21,11 +21,11 @@ public class MaterialOrdered extends AbstractEvent {
     public void setMaterialNm(String materialNm) {
         this.materialNm = materialNm;
     }
-    public String getQty() {
+    public Integer getQty() {
         return qty;
     }
 
-    public void setQty(String qty) {
+    public void setQty(Integer qty) {
         this.qty = qty;
     }
 }

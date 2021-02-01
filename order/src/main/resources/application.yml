@@ -37,6 +37,10 @@ logging:
     org.springframework.cloud: debug
 server:
   port: 8082
+
+api:
+  delivery:
+    url: http://localhost:8083
 ---
 
 spring:
@@ -62,3 +66,7 @@ spring:
         event-out:
           destination: searchrecipe
           contentType: application/json
+
+api:
+  delivery:
+    url: http://localhost:8080
