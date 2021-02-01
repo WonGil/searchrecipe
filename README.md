@@ -41,6 +41,35 @@
 
 ## 운영
 ### CI/CD 설정
+- git clone 실행
+- mvn package 실행
+- az acr build 실행
+- kubectl create deploy
+- kubectl expose
+- kubectl get all
+### 동기식 호출 / 서킷 브레이킹 / 장애격리
+- istio 사용 (Destination Rule)
+- Retry 적용
+- Pool Ejection
+### 오토스케일 아웃
+- HPA 사용
+- siege로 테스트
+### 모니터링, 앨럿팅
+- Kiali 활용
+- Jager 활용
+### 무정지 재배포
+- Autoscaler, CB 설정 제거
+- 테스트 후, Readiness Probe 설정 후 kubectl apply
+### 운영 유연성 - Persistence Volume, Persistence Volume Claim 적용
+- yaml 파일로 만들어서 붙이기
+### Canary Deploy
+- istio로 실행
+### ConfigMap 적용
+- 외부 주입 ConfigMap 적용
+### Secret 적용
+- secret 적용
+
+
 
 
 
