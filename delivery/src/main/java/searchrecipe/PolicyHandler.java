@@ -15,11 +15,20 @@ public class PolicyHandler{
 
     }
 
+    @Autowired
+    DeliveryRepository deliveryRepository;
+
     @StreamListener(KafkaProcessor.INPUT)
     public void wheneverOrdered_Ship(@Payload Ordered ordered){
 
         if(ordered.isMe()){
-            System.out.println("##### listener  : " + ordered.toJson());
+            //System.out.println("##### listener  : " + ordered.toJson());
+
+            Delivery delivery = new Delivery();
+            delivery.setOrderId(ordered.getId());
+            delivery.setStatus("Delivery Started");
+
+            deliveryRepository.save(delivery);            
         }
     }
 
