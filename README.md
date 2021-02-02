@@ -201,24 +201,23 @@ kubectl get all
 - Kubectl get all 결과 보여주기
 - 테스트를 위해서 Kafka zookeeper와 server도 별도로 실행 필요
 - deployment.yaml 편집 후 배포 방안 적어두기
-
+## 무정지 재배포
+- Autoscaler, CB 설정 제거
+- 테스트 후, Readiness Probe 설정 후 kubectl apply
+## 오토스케일 아웃
+- HPA 사용
+- siege로 테스트
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 - istio 사용 (Destination Rule)
 - Retry 적용
 - Pool Ejection
-## 오토스케일 아웃
-- HPA 사용
-- siege로 테스트
 ## 모니터링, 앨럿팅
 - Kiali 활용
 - Jager 활용
-## 무정지 재배포
-- Autoscaler, CB 설정 제거
-- 테스트 후, Readiness Probe 설정 후 kubectl apply
-## 운영 유연성 - Persistence Volume, Persistence Volume Claim 적용
-- yaml 파일로 만들어서 붙이기
 ## Canary Deploy
 - istio로 실행
+## 운영 유연성 - Persistence Volume, Persistence Volume Claim 적용
+- yaml 파일로 만들어서 붙이기
 ## ConfigMap 적용
 - 외부 주입 ConfigMap 적용
 ## Secret 적용
