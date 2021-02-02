@@ -400,7 +400,8 @@ kubectl autoscale deploy order --min=1 --max=10 --cpu-percent=15
 - 오토스케일 아웃 설정 확인
 ![image](https://user-images.githubusercontent.com/16534043/106556586-31680380-6563-11eb-94ec-12877e3eefad.png)
 ![image](https://user-images.githubusercontent.com/16534043/106556682-63796580-6563-11eb-817f-20376c4fe025.png)
-
+- hpa 설정 확인
+![image](https://user-images.githubusercontent.com/16534043/106557201-a7b93580-6564-11eb-9635-1a2259b94a0d.png)
 - siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
