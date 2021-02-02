@@ -393,8 +393,25 @@ kubectl get all
 - Autoscaler, CB 설정 제거
 - 테스트 후, Readiness Probe 설정 후 kubectl apply
 ## 오토스케일 아웃
-- HPA 사용
-- siege로 테스트
+- 서킷 브레이커는 시스템을 안정되게 운영할 수 있게 해줬지만, 사용자의 요청이 급증하는 경우, 오토스케일 아웃이 필요하다.
+- order 시스템에 replica를 자동으로 늘려줄 수 있도록 HPA를 설정한다. 설정은 CPU 사용량이 15%를 넘어서면 replica를 10개까지 늘려준다.
+```
+kubectl autoscale deploy order --min=1 --max=10 --cpu-percent=15
+```
+- siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
+```
+kubectl exec -it (siege POD 이름) -- /bin/bash
+siege -c1000 -t120s -r10 --content-type "application/json" 'http://localhost:8080/recipe'
+```
+- siege 실행 결과 표시
+- 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다.
+```
+kubectl get deploy order -w
+```
+- 스케일 아웃 결과 표시
+- siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.
+
+
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 - istio 사용 (Destination Rule)
 - Retry 적용
