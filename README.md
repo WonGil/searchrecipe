@@ -441,8 +441,35 @@ kubectl get all
 - 테스트를 위해서 Kafka zookeeper와 server도 별도로 실행 필요
 - deployment.yaml 편집 후 배포 방안 적어두기
 ## 무정지 재배포
-- Autoscaler, CB 설정 제거
-- 테스트 후, Readiness Probe 설정 후 kubectl apply
+- 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
+- seige 로 배포작업 직전에 워크로드를 모니터링 함
+```
+siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
+```
+- Readiness가 설정되지 않은 yml 파일로 배포 진행  
+![image](https://user-images.githubusercontent.com/16534043/106564492-a261e800-6570-11eb-9b2b-31fca5350825.png)
+```
+kubectl apply -f deployment_without_readiness.yml```
+```
+- Kubernetes가 준비가 되지 않은 delivery pod에 요청을 보내서 siege의 Availability 가 100% 미만으로 떨어짐
+- 중간에 socket에 끊겨서 siege 명령어 종료됨 (서비스 정지 발생)  
+![image](https://user-images.githubusercontent.com/16534043/106564722-fb318080-6570-11eb-92d5-181e50772e8b.png)
+- seige 로 배포작업 직전에 워크로드를 모니터링
+```
+siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
+```
+- Readiness가 설정된 yml 파일로 배포 진행  
+![image](https://user-images.githubusercontent.com/16534043/106564838-22884d80-6571-11eb-8cf1-dd0e53b547d7.png)
+```
+kubectl apply -f deployment_with_readiness.yml```
+```
+- 배포 중 pod가 2개가 뜨고, 새롭게 띄운 pod가 준비될 때까지, 기존 pod가 유지됨을 확인  
+![image](https://user-images.githubusercontent.com/16534043/106564937-52375580-6571-11eb-994f-b69acceb64b0.png)  
+![image](https://user-images.githubusercontent.com/16534043/106565031-75620500-6571-11eb-9028-bd05d8125f04.png)
+- siege 가 중단되지 않고, Availability가 높아졌음을 확인하여 무정지 재배포가 됨을 확인함  
+![image](https://user-images.githubusercontent.com/16534043/106565135-a80bfd80-6571-11eb-943e-b3bd77c519db.png)
+
+-
 ## 오토스케일 아웃
 - 서킷 브레이커는 시스템을 안정되게 운영할 수 있게 해줬지만, 사용자의 요청이 급증하는 경우, 오토스케일 아웃이 필요하다.
 - 단, 부하가 제대로 걸리기 위해서, recipe 서비스의 리소스를 줄여서 재배포한다.
