@@ -425,7 +425,7 @@ kubectl apply -f - <<EOF
                 cpu: 200m
 EOF
 ```
-다시 expose 해준다.
+- 다시 expose 해준다.
 ```
 kubectl expose deploy recipe --type="ClusterIP" --port=8080
 
