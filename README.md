@@ -29,8 +29,14 @@ https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 ![image](https://user-images.githubusercontent.com/16534043/106469623-de4e6c00-64e2-11eb-9c5d-bd3d43fa6340.png)
 ## EventStorming 결과
 ![image](https://user-images.githubusercontent.com/12531980/106534309-28f9d380-6537-11eb-878b-ae136d43cdcc.png)
-
-
+### 이벤트 도출
+### 부적격 이벤트 탈락
+### 폴리시 부착
+### 액터, 커맨드 부착하여 읽기 좋게
+### 어그리게잇으로 묶기
+### 바운디드 컨텍스트로 묶기
+### 폴리시의 이동과 컨텍스트 매핑 (점선은 Pub/Sub , 실선은 Req/Res)
+### 완성된 1차 모형
 ### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 
 ## 헥사고날 아키텍쳐 다이어그램 도출 (Polyglot)
