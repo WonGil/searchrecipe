@@ -28,18 +28,20 @@ https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 ## TO-BE 조직 (Vertically-Aligned)
 ![image](https://user-images.githubusercontent.com/16534043/106469623-de4e6c00-64e2-11eb-9c5d-bd3d43fa6340.png)
 ## EventStorming 결과
-### 이벤트 도출
-### 부적격 이벤트 탈락
-### 폴리시 부착
-### 액터, 커맨드 부착하여 읽기 좋게
-### 어그리게잇으로 묶기
-### 바운디드 컨텍스트로 묶기
-### 폴리시의 이동과 컨텍스트 매핑 (점선은 Pub/Sub , 실선은 Req/Res)
 ### 완성된 1차 모형
 ![image](https://user-images.githubusercontent.com/12531980/106534309-28f9d380-6537-11eb-878b-ae136d43cdcc.png)
-### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 
+### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
+![image](https://user-images.githubusercontent.com/12531980/106551677-18f2eb80-6559-11eb-907a-7da3b69ce975.png)
+```
+- 고객이 등록한 레시피를 확인한다. (1, ok)
+- 레시피를 등록하면 필요한 재료가 주문이 된다. (2 -> 3, ok)
+- 주문 접수가 되면 배송이 되고 주문 상태가 '배송 시작'으로 변경된다. (3 -> 4, ok)
+- 고객이 주문 취소를 하게 되면 배달이 취소된다. (5 -> 6, ok)
+- 고객은 중간마다 주문상태를 My Page 를 통해 확인 할 수 있다. (7, ok)
+```
 ## 헥사고날 아키텍쳐 다이어그램 도출 (Polyglot)
+![image](https://user-images.githubusercontent.com/12531980/106552529-dd592100-655a-11eb-9d86-dbb94faebe62.png)
 
 # 구현
 분석/설계 단계에서 도출된 헥사고날 아키텍처에 따라, 각 BC별로 대변되는 마이크로 서비스들을 스프링부트로 구현하였다. 구현한 각 서비스를 로컬에서 실행하는 방법은 아래와 같다 (각자의 포트넘버는 8081 ~ 8084, 8088 이다)
@@ -288,27 +290,22 @@ public class Order {
         cancellation.setStatus("Delivery Cancelled");
         OrderApplication.applicationContext.getBean(searchrecipe.external.CancellationService.class)
             .cancel(cancellation);
-
-
     }
     //...
 }
 ```
-- 동기식 출에서는 호출 시간에 따른 타임 커플링이 발생하여, 주문 취소 시스템에 장애가 나면 배송도 취소되지 않는 다는 것을 확인
-```
-# 배송(Delivery) 서비스를 잠시 내려놓음 (ctrl+c)
-# 주문 취소(cancel) 요청
-http http://????코드 넣어야함
-```
-- 에러 난 화면 표시
-```
-# 배송(Delivery) 서비스 재기동
-cd delivery
-mvn spring-boot:run
-# 주문 취소(cancel) 요청
-http http://????코드 넣어야함
-```
-- 주문 취소 된 화면 표시
+- 동기식 출에서는 호출 시간에 따른 타임 커플링이 발생하여, 주문 취소 시스템에 장애가 나면 배송도 취소되지 않는다는 것을 확인
+
+  - 배송(Delivery) 서비스를 잠시 내려놓음 (ctrl+c)
+  ![image](https://user-images.githubusercontent.com/12531980/106551276-425f4780-6558-11eb-87d0-db00d11f70cb.png)
+
+  - 주문 취소(cancel) 요청 및 에러 난 화면 표시
+  ![image]](https://user-images.githubusercontent.com/12531980/106551103-da106600-6557-11eb-8609-4593a0b7d8c2.png)
+
+  - 배송(Delivery) 서비스 재기 동 후 다시 주문 취소 요청
+  ![image](https://user-images.githubusercontent.com/12531980/106551365-6d499b80-6558-11eb-84b7-b454b1df15c8.png)
+
+
 - 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
 
 ## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
