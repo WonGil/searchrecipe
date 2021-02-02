@@ -373,7 +373,7 @@ kubectl create deploy gateway --image=skccteam02.azurecr.io/gateway:v1
 kubectl create deploy mypage --image=skccteam02.azurecr.io/mypage:v1
 kubectl get all
 ```
-- Kubectl Deploy 결과 확인
+- Kubectl Deploy 결과 확인  
 ![image](https://user-images.githubusercontent.com/16534043/106553685-34f88c00-655d-11eb-87cb-e59a6f920a5b.png)
 - Kubernetes에서 서비스 생성하기 (Docker 생성이기에 Port는 8080이며, Gateway는 LoadBalancer로 생성)
 ```
@@ -384,7 +384,7 @@ kubectl expose deploy gateway --type="LoadBalancer" --port=8080
 kubectl expose deploy mypage --type="ClusterIP" --port=8080
 kubectl get all
 ```
-- Kubectl Expose 결과 확인
+- Kubectl Expose 결과 확인  
 ![image](https://user-images.githubusercontent.com/16534043/106554016-e0a1dc00-655d-11eb-8439-f4326cecda5a.png)
 - 테스트를 위해서 Kafka zookeeper와 server도 별도로 실행 필요
 - deployment.yaml 편집 후 배포 방안 적어두기
@@ -434,9 +434,9 @@ kubectl expose deploy recipe --type="ClusterIP" --port=8080
 ```
 kubectl autoscale deploy recipe --min=1 --max=10 --cpu-percent=15
 ```
-- hpa 설정 확인
+- hpa 설정 확인  
 ![image](https://user-images.githubusercontent.com/16534043/106558142-9709bf00-6566-11eb-9340-12959204fee8.png)
-- hpa 상세 설정 확인
+- hpa 상세 설정 확인  
 ![image](https://user-images.githubusercontent.com/16534043/106558218-b3a5f700-6566-11eb-9b74-0c93679d2b31.png)
 ![image](https://user-images.githubusercontent.com/16534043/106558245-c0c2e600-6566-11eb-89fe-8a6178e1f976.png)
 - - siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
