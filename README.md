@@ -393,6 +393,43 @@ kubectl get all
 - 테스트 후, Readiness Probe 설정 후 kubectl apply
 ## 오토스케일 아웃
 - 서킷 브레이커는 시스템을 안정되게 운영할 수 있게 해줬지만, 사용자의 요청이 급증하는 경우, 오토스케일 아웃이 필요하다.
+- 단, 부하가 제대로 걸리기 위해서, recipe 서비스의 리소스를 줄여서 재배포한다.
+```
+kubectl apply -f - <<EOF
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: recipe
+    namespace: default
+    labels:
+      app: recipe
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: recipe
+    template:
+      metadata:
+        labels:
+          app: recipe
+      spec:
+        containers:
+          - name: recipe
+            image: skccteam02.azurecr.io/recipe:v1
+            ports:
+              - containerPort: 8080
+            resources:
+              limits:
+                cpu: 500m
+              requests:
+                cpu: 200m
+EOF
+```
+다시 expose 해준다.
+```
+kubectl expose deploy recipe --type="ClusterIP" --port=8080
+
+```
 - recipe 시스템에 replica를 자동으로 늘려줄 수 있도록 HPA를 설정한다. 설정은 CPU 사용량이 15%를 넘어서면 replica를 10개까지 늘려준다.
 ```
 kubectl autoscale deploy recipe --min=1 --max=10 --cpu-percent=15
@@ -402,21 +439,28 @@ kubectl autoscale deploy recipe --min=1 --max=10 --cpu-percent=15
 - hpa 상세 설정 확인
 ![image](https://user-images.githubusercontent.com/16534043/106558218-b3a5f700-6566-11eb-9b74-0c93679d2b31.png)
 ![image](https://user-images.githubusercontent.com/16534043/106558245-c0c2e600-6566-11eb-89fe-8a6178e1f976.png)
-
 - siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
-siege -c1000 -t120s -r10 --content-type "application/json" 'http://localhost:8080/recipe'
+siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ```
-- siege 실행 결과 표시
 - 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다.
 ```
-kubectl get deploy order -w
+watch kubectl get all
 ```
-- 스케일 아웃 설정 확인
+- siege 실행 결과 표시
+![image](https://user-images.githubusercontent.com/16534043/106560612-a12dbc80-656a-11eb-8213-5a07a0a03561.png)
+- 오토스케일이 되지 않아, siege 성공률이 낮다.
 
+- 스케일 아웃이 자동으로 되었음을 확인
+![image](https://user-images.githubusercontent.com/16534043/106560501-75aad200-656a-11eb-99dc-fe585ef7e741.png)
+- siege 재실행
+```
+kubectl exec -it (siege POD 이름) -- /bin/bash
+siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:8080/recipes POST {"recipeNm": "apple_Juice"}'
+```
 - siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.
-
+![image](https://user-images.githubusercontent.com/16534043/106560930-3335c500-656b-11eb-8165-bcb066a03f15.png)
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 - istio 사용 (Destination Rule)
