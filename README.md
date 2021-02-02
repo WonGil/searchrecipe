@@ -153,10 +153,13 @@ public class Order {
 
 ```
 
-적용 후 REST API의 테스트를 통하여 정상적으로 동작하는 것을 확인할 수 있었다.  
-![image](https://user-images.githubusercontent.com/12531980/106535000-9c501500-6538-11eb-89be-f5c1078ad4c3.png)
+- 적용 후 REST API의 테스트를 통하여 정상적으로 동작하는 것을 확인할 수 있었다.  
+  - 주문 수행 (MaterialOrdered)
 
-![image](https://user-images.githubusercontent.com/12531980/106535116-d6b9b200-6538-11eb-8498-46b2d9398b79.png)
+  ![image](https://user-images.githubusercontent.com/12531980/106535000-9c501500-6538-11eb-89be-f5c1078ad4c3.png)
+
+  - 주문 목록 조회
+  ![image](https://user-images.githubusercontent.com/12531980/106535116-d6b9b200-6538-11eb-8498-46b2d9398b79.png)
 
 ## Gateway 적용
 API Gateway를 통하여 마이크로 서비스들의 진입점을 통일하였다.
@@ -242,7 +245,9 @@ server:
 ## 폴리그랏 퍼시스턴스
 - recipe의 경우, 다른 마이크로 서비스들과 달리 조회 기능도 제공해야 하기에, HSQL을 사용하여 구현하였다. 이를 통해, 마이크로 서비스 간 서로 다른 종류의 데이터베이스를 사용해도 문제 없이 동작하여 폴리그랏 퍼시스턴스를 충족시켰다.
 
-![image](https://user-images.githubusercontent.com/12531980/106535831-70359380-653a-11eb-8e81-1654226aa9e9.png)
+  **recipe 서비스의 pom.xml**
+
+  ![image](https://user-images.githubusercontent.com/12531980/106535831-70359380-653a-11eb-8e81-1654226aa9e9.png)
 
 
 ## 유비쿼터스 랭귀지
@@ -295,13 +300,10 @@ public class Order {
 }
 ```
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하여, 주문 취소 시스템에 장애가 나면 배송도 취소되지 않는다는 것을 확인
-
   - 배송(Delivery) 서비스를 잠시 내려놓음 (ctrl+c)  
   ![image](https://user-images.githubusercontent.com/12531980/106551276-425f4780-6558-11eb-87d0-db00d11f70cb.png)
-
   - 주문 취소(cancel) 요청 및 에러 난 화면 표시  
   ![image](https://user-images.githubusercontent.com/12531980/106551103-da106600-6557-11eb-8609-4593a0b7d8c2.png)
-
   - 배송(Delivery) 서비스 재기동 후 다시 주문 취소 요청  
   ![image](https://user-images.githubusercontent.com/12531980/106551365-6d499b80-6558-11eb-84b7-b454b1df15c8.png)
 
@@ -357,13 +359,16 @@ public class PolicyHandler{
   - Recipe 서비스와 Order 서비스가 둘 다 동시에 돌아가고 있을때 Recipe 서비스 실행시 이상 없음  
   ![image](https://user-images.githubusercontent.com/12531980/106556204-5f007d00-6562-11eb-8087-e0260a54d7bd.png)
   - Order 서비스를 내림  
-  ![image](https://user-images.githubusercontent.com/12531980/106555946-e699bc00-6561-11eb-81de-15ea39698d35.png)
-  - Recipe 서비스를 실행하여도 이상 없이 동작  
+  ![image](https://user-images.githubusercontent.com/12531980/106555946-e699bc00-6561-11eb-81de-15ea39698d35.png)  
+  - Recipe 서비스를 실행하여도 이상 없이 동작    
   ![image](https://user-images.githubusercontent.com/12531980/106556261-7ccde200-6562-11eb-82d1-cd38eb3075fe.png)
 
 ## CQRS
-viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.  
-![image](https://user-images.githubusercontent.com/12531980/106536654-3c5b6d80-653c-11eb-8c20-2853c1743a12.png)
+viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.
+- MaterialOrdered 수행 후의 mypage  
+![image](https://user-images.githubusercontent.com/12531980/106606835-ecb18c00-65a5-11eb-85fa-9342cc8bef3d.png)
+- OrderCanceled 수행 후의 mypage
+![image](https://user-images.githubusercontent.com/12531980/106606970-17034980-65a6-11eb-91e3-55c4e31a7e36.png)
 
 
 # 운영

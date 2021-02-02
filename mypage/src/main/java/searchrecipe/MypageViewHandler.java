@@ -18,35 +18,17 @@ public class MypageViewHandler {
     private MypageRepository mypageRepository;
 
     @StreamListener(KafkaProcessor.INPUT)
-    public void whenOrdered_then_CREATE_1 (@Payload Ordered ordered) {
-        try {
-            if (ordered.isMe()) {
-                // view 객체 생성
-                Mypage mypage  = new Mypage();
-                // view 객체에 이벤트의 Value 를 set 함
-                mypage.setOrderId(ordered.getId());
-                mypage.setMaterialNm(ordered.getMaterialNm());
-                mypage.setQty(ordered.getQty());
-                // view 레파지 토리에 save
-                mypageRepository.save(mypage);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    @StreamListener(KafkaProcessor.INPUT)
-    public void whenMaterialOrdered_then_CREATE_2 (@Payload MaterialOrdered materialOrdered) {
+    public void whenMaterialOrdered_then_CREATE_1 (@Payload MaterialOrdered materialOrdered) {
         try {
             if (materialOrdered.isMe()) {
                 // view 객체 생성
-                Mypage mypage  = new Mypage();
+                Mypage mypage = new Mypage();
                 // view 객체에 이벤트의 Value 를 set 함
                 mypage.setMaterialNm(materialOrdered.getMaterialNm());
                 mypage.setQty(materialOrdered.getQty());
                 mypage.setRecipeNm(materialOrdered.getRecipeNm());
                 mypage.setCookingMethod(materialOrdered.getCookingMethod());
-                mypage.setRecipeId(materialOrdered.getId());
+                mypage.setRecipeId((materialOrdered.getId()));
                 // view 레파지 토리에 save
                 mypageRepository.save(mypage);
             }
@@ -64,7 +46,6 @@ public class MypageViewHandler {
                 List<Mypage> mypageList = mypageRepository.findByOrderId(shipped.getOrderId());
                 for(Mypage mypage : mypageList){
                     // view 객체에 이벤트의 eventDirectValue 를 set 함
-                    mypage.setDeliveryId(shipped.getId());
                     mypage.setStatus(shipped.getStatus());
                     // view 레파지 토리에 save
                     mypageRepository.save(mypage);
@@ -91,5 +72,22 @@ public class MypageViewHandler {
             e.printStackTrace();
         }
     }
-
+    @StreamListener(KafkaProcessor.INPUT)
+    public void whenOrdered_then_UPDATE_3(@Payload Ordered ordered) {
+        try {
+            if (ordered.isMe()) {
+                // view 객체 조회
+                Optional<Mypage> one = mypageRepository.findById(ordered.getId());
+                if (one.isPresent()) {
+                    Mypage mypage = one.get();
+                    // view 객체에 이벤트의 eventDirectValue 를 set 함
+                    mypage.setOrderId(ordered.getId());
+                    // view 레파지 토리에 save
+                    mypageRepository.save(mypage);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

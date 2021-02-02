@@ -11,13 +11,12 @@ public class Mypage {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private Long orderId;
-    private Long deliveryId;
-    private Long recipeId;
     private String status;
     private String materialNm;
     private Integer qty;
     private String recipeNm;
     private String cookingMethod;
+    private Long recipeId;
 
 
     public Long getId() {
@@ -34,23 +33,8 @@ public class Mypage {
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
-    public Long getDeliveryId() {
-        return deliveryId;
-    }
-
-    public void setDeliveryId(Long deliveryId) {
-        this.deliveryId = deliveryId;
-    }
     public String getStatus() {
         return status;
-    }
-
-    public Long getRecipeId() {
-        return recipeId;
-    }
-
-    public void setRecipeId(Long recipeId) {
-        this.recipeId = recipeId;
     }
 
     public void setStatus(String status) {
@@ -70,7 +54,6 @@ public class Mypage {
     public void setQty(Integer qty) {
         this.qty = qty;
     }
-
     public String getRecipeNm() {
         return recipeNm;
     }
@@ -84,6 +67,13 @@ public class Mypage {
 
     public void setCookingMethod(String cookingMethod) {
         this.cookingMethod = cookingMethod;
+    }
+    public Long getRecipeId() {
+        return recipeId;
+    }
+
+    public void setRecipeId(Long recipeId) {
+        this.recipeId = recipeId;
     }
 
 }

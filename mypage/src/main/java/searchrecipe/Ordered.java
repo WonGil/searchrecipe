@@ -5,7 +5,6 @@ public class Ordered extends AbstractEvent {
     private Long id;
     private String materialNm;
     private Integer qty;
-    private String status;
 
     public Long getId() {
         return id;
@@ -27,12 +26,5 @@ public class Ordered extends AbstractEvent {
 
     public void setQty(Integer qty) {
         this.qty = qty;
-    }
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

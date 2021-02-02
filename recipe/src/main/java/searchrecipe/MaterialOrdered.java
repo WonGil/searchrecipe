@@ -5,6 +5,7 @@ public class MaterialOrdered extends AbstractEvent {
     private Long id;
     private String materialNm;
     private Integer qty;
+    private Long orderId;
     private String recipeNm;
     private String cookingMethod;
 
@@ -42,5 +43,12 @@ public class MaterialOrdered extends AbstractEvent {
 
     public void setCookingMethod(String cookingMethod) {
         this.cookingMethod = cookingMethod;
+    }
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 }
