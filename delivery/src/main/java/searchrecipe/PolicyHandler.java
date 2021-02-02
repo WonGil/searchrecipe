@@ -27,6 +27,7 @@ public class PolicyHandler{
             Delivery delivery = new Delivery();
             delivery.setOrderId(ordered.getId());
             delivery.setStatus("Delivery Started");
+            //delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
 
             deliveryRepository.save(delivery);            
         }
