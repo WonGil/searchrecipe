@@ -355,31 +355,31 @@ mvn package
 ```
 cd ~/gitsource/searchrecipe
 cd recipe
-az acr build --registry skcc04 --image skcc04.azurecr.io/recipe:v1 .
+az acr build --registry skccteam02 --image skccteam02.azurecr.io/recipe:v1 .
 
 cd ..
 cd order
-az acr build --registry skcc04 --image skcc04.azurecr.io/order:v1 .
+az acr build --registry skccteam02 --image skccteam02.azurecr.io/order:v1 .
 
 cd ..
 cd delivery
-az acr build --registry skcc04 --image skcc04.azurecr.io/delivery:v1 .
+az acr build --registry skccteam02 --image skccteam02.azurecr.io/delivery:v1 .
 
 cd ..
 cd gateway
-az acr build --registry skcc04 --image skcc04.azurecr.io/gateway:v1 .
+az acr build --registry skccteam02 --image skccteam02.azurecr.io/gateway:v1 .
 
 cd ..
 cd mypage
-az acr build --registry skcc04 --image skcc04.azurecr.io/mypage:v1 .
+az acr build --registry skccteam02 --image skccteam02.azurecr.io/mypage:v1 .
 ```
 - ACR에서 이미지 가져와서 Kubernetes에서 Deploy하기
 ```
-kubectl create deploy recipe --image=skcc04.azurecr.io/recipe:v1
-kubectl create deploy order --image=skcc04.azurecr.io/order:v1
-kubectl create deploy delivery --image=skcc04.azurecr.io/delivery:v1
-kubectl create deploy gateway --image=skcc04.azurecr.io/gateway:v1
-kubectl create deploy mypage --image=skcc04.azurecr.io/mypage:v1
+kubectl create deploy recipe --image=skccteam02.azurecr.io/recipe:v1
+kubectl create deploy order --image=skccteam02.azurecr.io/order:v1
+kubectl create deploy delivery --image=skccteam02.azurecr.io/delivery:v1
+kubectl create deploy gateway --image=skccteam02.azurecr.io/gateway:v1
+kubectl create deploy mypage --image=skccteam02.azurecr.io/mypage:v1
 kubectl get all
 ```
 - Kubectl get all 결과 보여주기
