@@ -182,10 +182,10 @@ az acr build --registry skcc04 --image skcc04.azurecr.io/mypage:v1 .
 - ACR에서 이미지 가져와서 Kubernetes에서 Deploy하기
 ```
 kubectl create deploy recipe --image=skcc04.azurecr.io/recipe:v1
-kubectl create deploy recipe --image=skcc04.azurecr.io/order:v1
-kubectl create deploy recipe --image=skcc04.azurecr.io/delivery:v1
-kubectl create deploy recipe --image=skcc04.azurecr.io/gateway:v1
-kubectl create deploy recipe --image=skcc04.azurecr.io/mypage:v1
+kubectl create deploy order --image=skcc04.azurecr.io/order:v1
+kubectl create deploy delivery --image=skcc04.azurecr.io/delivery:v1
+kubectl create deploy gateway --image=skcc04.azurecr.io/gateway:v1
+kubectl create deploy mypage --image=skcc04.azurecr.io/mypage:v1
 kubectl get all
 ```
 - Kubectl get all 결과 보여주기
