@@ -393,15 +393,16 @@ kubectl get all
 - 테스트 후, Readiness Probe 설정 후 kubectl apply
 ## 오토스케일 아웃
 - 서킷 브레이커는 시스템을 안정되게 운영할 수 있게 해줬지만, 사용자의 요청이 급증하는 경우, 오토스케일 아웃이 필요하다.
-- order 시스템에 replica를 자동으로 늘려줄 수 있도록 HPA를 설정한다. 설정은 CPU 사용량이 15%를 넘어서면 replica를 10개까지 늘려준다.
+- recipe 시스템에 replica를 자동으로 늘려줄 수 있도록 HPA를 설정한다. 설정은 CPU 사용량이 15%를 넘어서면 replica를 10개까지 늘려준다.
 ```
-kubectl autoscale deploy order --min=1 --max=10 --cpu-percent=15
+kubectl autoscale deploy recipe --min=1 --max=10 --cpu-percent=15
 ```
-- 오토스케일 아웃 설정 확인
-![image](https://user-images.githubusercontent.com/16534043/106556586-31680380-6563-11eb-94ec-12877e3eefad.png)
-![image](https://user-images.githubusercontent.com/16534043/106556682-63796580-6563-11eb-817f-20376c4fe025.png)
 - hpa 설정 확인
-![image](https://user-images.githubusercontent.com/16534043/106557201-a7b93580-6564-11eb-9635-1a2259b94a0d.png)
+![image](https://user-images.githubusercontent.com/16534043/106558142-9709bf00-6566-11eb-9340-12959204fee8.png)
+- hpa 상세 설정 확인
+![image](https://user-images.githubusercontent.com/16534043/106558218-b3a5f700-6566-11eb-9b74-0c93679d2b31.png)
+![image](https://user-images.githubusercontent.com/16534043/106558245-c0c2e600-6566-11eb-89fe-8a6178e1f976.png)
+
 - siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
