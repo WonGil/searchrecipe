@@ -300,7 +300,7 @@ public class Order {
   ![image](https://user-images.githubusercontent.com/12531980/106551276-425f4780-6558-11eb-87d0-db00d11f70cb.png)
 
   - 주문 취소(cancel) 요청 및 에러 난 화면 표시  
-  ![image]](https://user-images.githubusercontent.com/12531980/106551103-da106600-6557-11eb-8609-4593a0b7d8c2.png)
+  ![image](https://user-images.githubusercontent.com/12531980/106551103-da106600-6557-11eb-8609-4593a0b7d8c2.png)
 
   - 배송(Delivery) 서비스 재기동 후 다시 주문 취소 요청  
   ![image](https://user-images.githubusercontent.com/12531980/106551365-6d499b80-6558-11eb-84b7-b454b1df15c8.png)
@@ -437,7 +437,7 @@ kubectl expose deploy mypage --type="ClusterIP" --port=8080
 kubectl get all
 ```
 - Kubectl Expose 결과 확인  
-![image](https://user-images.githubusercontent.com/16534043/106554016-e0a1dc00-655d-11eb-8439-f4326cecda5a.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106554016-e0a1dc00-655d-11eb-8439-f4326cecda5a.png)
 - 테스트를 위해서 Kafka zookeeper와 server도 별도로 실행 필요
 - deployment.yaml 편집 후 배포 방안 적어두기
 ## 무정지 재배포
@@ -447,27 +447,27 @@ kubectl get all
 siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
 ```
 - Readiness가 설정되지 않은 yml 파일로 배포 진행  
-![image](https://user-images.githubusercontent.com/16534043/106564492-a261e800-6570-11eb-9b2b-31fca5350825.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106564492-a261e800-6570-11eb-9b2b-31fca5350825.png)
 ```
 kubectl apply -f deployment_without_readiness.yml
 ```
 - 아래 그림과 같이, Kubernetes가 준비가 되지 않은 delivery pod에 요청을 보내서 siege의 Availability 가 100% 미만으로 떨어짐
 - 중간에 socket에 끊겨서 siege 명령어 종료됨 (서비스 정지 발생)  
-![image](https://user-images.githubusercontent.com/16534043/106564722-fb318080-6570-11eb-92d5-181e50772e8b.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106564722-fb318080-6570-11eb-92d5-181e50772e8b.png)
 - 무정지 재배포 여부 확인 전에, siege 로 배포작업 직전에 워크로드를 모니터링
 ```
 siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
 ```
 - Readiness가 설정된 yml 파일로 배포 진행  
-![image](https://user-images.githubusercontent.com/16534043/106564838-22884d80-6571-11eb-8cf1-dd0e53b547d7.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106564838-22884d80-6571-11eb-8cf1-dd0e53b547d7.png)
 ```
 kubectl apply -f deployment_with_readiness.yml```
 ```
 - 배포 중 pod가 2개가 뜨고, 새롭게 띄운 pod가 준비될 때까지, 기존 pod가 유지됨을 확인  
-![image](https://user-images.githubusercontent.com/16534043/106564937-52375580-6571-11eb-994f-b69acceb64b0.png)  
-![image](https://user-images.githubusercontent.com/16534043/106565031-75620500-6571-11eb-9028-bd05d8125f04.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106564937-52375580-6571-11eb-994f-b69acceb64b0.png)  
+  ![image](https://user-images.githubusercontent.com/16534043/106565031-75620500-6571-11eb-9028-bd05d8125f04.png)
 - siege 가 중단되지 않고, Availability가 높아졌음을 확인하여 무정지 재배포가 됨을 확인함  
-![image](https://user-images.githubusercontent.com/16534043/106565135-a80bfd80-6571-11eb-943e-b3bd77c519db.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106565135-a80bfd80-6571-11eb-943e-b3bd77c519db.png)
 
 ## 오토스케일 아웃
 - 서킷 브레이커는 시스템을 안정되게 운영할 수 있게 해줬지만, 사용자의 요청이 급증하는 경우, 오토스케일 아웃이 필요하다.
@@ -513,10 +513,10 @@ kubectl expose deploy recipe --type="ClusterIP" --port=8080
 kubectl autoscale deploy recipe --min=1 --max=10 --cpu-percent=15
 ```
 - hpa 설정 확인  
-![image](https://user-images.githubusercontent.com/16534043/106558142-9709bf00-6566-11eb-9340-12959204fee8.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106558142-9709bf00-6566-11eb-9340-12959204fee8.png)
 - hpa 상세 설정 확인  
-![image](https://user-images.githubusercontent.com/16534043/106558218-b3a5f700-6566-11eb-9b74-0c93679d2b31.png)
-![image](https://user-images.githubusercontent.com/16534043/106558245-c0c2e600-6566-11eb-89fe-8a6178e1f976.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106558218-b3a5f700-6566-11eb-9b74-0c93679d2b31.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106558245-c0c2e600-6566-11eb-89fe-8a6178e1f976.png)
 - - siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
@@ -527,18 +527,18 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 watch kubectl get all
 ```
 - siege 실행 결과 표시  
-![image](https://user-images.githubusercontent.com/16534043/106560612-a12dbc80-656a-11eb-8213-5a07a0a03561.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106560612-a12dbc80-656a-11eb-8213-5a07a0a03561.png)
 - 오토스케일이 되지 않아, siege 성공률이 낮다.
 
 - 스케일 아웃이 자동으로 되었음을 확인
-![image](https://user-images.githubusercontent.com/16534043/106560501-75aad200-656a-11eb-99dc-fe585ef7e741.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106560501-75aad200-656a-11eb-99dc-fe585ef7e741.png)
 - siege 재실행
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
 siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ```
 - siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.  
-![image](https://user-images.githubusercontent.com/16534043/106560930-3335c500-656b-11eb-8165-bcb066a03f15.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106560930-3335c500-656b-11eb-8165-bcb066a03f15.png)
 
 ## Self-healing (Liveness Probe)
 - delivery 시스템 yml 파일의 liveness probe 설정을 바꾸어서, liveness probe가 동작함을 확인
@@ -555,9 +555,9 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 ```
 
 - delivery에 liveness가 적용된 것을 확인  
-![image](https://user-images.githubusercontent.com/16534043/106566682-f7ebc400-6573-11eb-8452-ed693bdf1f17.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106566682-f7ebc400-6573-11eb-8452-ed693bdf1f17.png)
 - delivery에 liveness가 발동되었고, 8090 포트에 응답이 없기에 Restart가 발생함   
-![image](https://user-images.githubusercontent.com/16534043/106566789-210c5480-6574-11eb-8e71-ae11755e274f.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106566789-210c5480-6574-11eb-8e71-ae11755e274f.png)
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 - istio 사용 (Destination Rule)
@@ -592,7 +592,7 @@ delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
                   key: word
 
 ```  
-![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)
 
 ## Secret 적용
 - secret 적용
