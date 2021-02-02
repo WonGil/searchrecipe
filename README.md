@@ -442,7 +442,7 @@ kubectl get all
 - deployment.yaml 편집 후 배포 방안 적어두기
 ## 무정지 재배포
 - 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
-- seige 로 배포작업 직전에 워크로드를 모니터링 함
+- siege 로 배포작업 직전에 워크로드를 모니터링 함
 ```
 siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
 ```
@@ -454,7 +454,7 @@ kubectl apply -f deployment_without_readiness.yml
 - 아래 그림과 같이, Kubernetes가 준비가 되지 않은 delivery pod에 요청을 보내서 siege의 Availability 가 100% 미만으로 떨어짐
 - 중간에 socket에 끊겨서 siege 명령어 종료됨 (서비스 정지 발생)  
 ![image](https://user-images.githubusercontent.com/16534043/106564722-fb318080-6570-11eb-92d5-181e50772e8b.png)
-- seige 로 배포작업 직전에 워크로드를 모니터링
+- 무정지 재배포 여부 확인 전에, siege 로 배포작업 직전에 워크로드를 모니터링
 ```
 siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
 ```
