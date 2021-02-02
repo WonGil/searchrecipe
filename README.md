@@ -23,15 +23,15 @@
 https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 
 # 분석/설계
-## AS-IS 조직 (Horizontally-Aligned)
+## AS-IS 조직 (Horizontally-Aligned)  
 ![image](https://user-images.githubusercontent.com/16534043/106468971-f7a2e880-64e1-11eb-9e3e-faf334166094.png)
-## TO-BE 조직 (Vertically-Aligned)
+## TO-BE 조직 (Vertically-Aligned)  
 ![image](https://user-images.githubusercontent.com/16534043/106469623-de4e6c00-64e2-11eb-9c5d-bd3d43fa6340.png)
 ## EventStorming 결과
-### 완성된 1차 모형
+### 완성된 1차 모형  
 ![image](https://user-images.githubusercontent.com/12531980/106534309-28f9d380-6537-11eb-878b-ae136d43cdcc.png)
 
-### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
+### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증  
 ![image](https://user-images.githubusercontent.com/12531980/106551677-18f2eb80-6559-11eb-907a-7da3b69ce975.png)
 ```
 - 고객이 등록한 레시피를 확인한다. (1, ok)
@@ -40,7 +40,7 @@ https://workflowy.com/s/assessment/qJn45fBdVZn4atl3
 - 고객이 주문 취소를 하게 되면 배달이 취소된다. (5 -> 6, ok)
 - 고객은 중간마다 주문상태를 My Page 를 통해 확인 할 수 있다. (7, ok)
 ```
-## 헥사고날 아키텍쳐 다이어그램 도출 (Polyglot)
+## 헥사고날 아키텍쳐 다이어그램 도출 (Polyglot)  
 ![image](https://user-images.githubusercontent.com/12531980/106552529-dd592100-655a-11eb-9d86-dbb94faebe62.png)
 
 # 구현
@@ -153,7 +153,7 @@ public class Order {
 
 ```
 
-적용 후 REST API의 테스트를 통하여 정상적으로 동작하는 것을 확인할 수 있었다.
+적용 후 REST API의 테스트를 통하여 정상적으로 동작하는 것을 확인할 수 있었다.  
 ![image](https://user-images.githubusercontent.com/12531980/106535000-9c501500-6538-11eb-89be-f5c1078ad4c3.png)
 
 ![image](https://user-images.githubusercontent.com/12531980/106535116-d6b9b200-6538-11eb-8498-46b2d9398b79.png)
@@ -296,13 +296,13 @@ public class Order {
 ```
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하여, 주문 취소 시스템에 장애가 나면 배송도 취소되지 않는다는 것을 확인
 
-  - 배송(Delivery) 서비스를 잠시 내려놓음 (ctrl+c)
+  - 배송(Delivery) 서비스를 잠시 내려놓음 (ctrl+c)  
   ![image](https://user-images.githubusercontent.com/12531980/106551276-425f4780-6558-11eb-87d0-db00d11f70cb.png)
 
-  - 주문 취소(cancel) 요청 및 에러 난 화면 표시
+  - 주문 취소(cancel) 요청 및 에러 난 화면 표시  
   ![image]](https://user-images.githubusercontent.com/12531980/106551103-da106600-6557-11eb-8609-4593a0b7d8c2.png)
 
-  - 배송(Delivery) 서비스 재기동 후 다시 주문 취소 요청
+  - 배송(Delivery) 서비스 재기동 후 다시 주문 취소 요청  
   ![image](https://user-images.githubusercontent.com/12531980/106551365-6d499b80-6558-11eb-84b7-b454b1df15c8.png)
 
 ## 비동기식 호출 (Pub/Sub 방식)
@@ -354,15 +354,15 @@ public class PolicyHandler{
 }
 ```
 - 비동기식 호출은 다른 서비스가 비정상이여도 이상없이 동작가능하여, 주문 서비스에 장애가 나도 레시피 서비스는 정상 동작을 확인
-  - Recipe 서비스와 Order 서비스가 둘 다 동시에 돌아가고 있을때 Recipe 서비스 실행시 이상 없음
+  - Recipe 서비스와 Order 서비스가 둘 다 동시에 돌아가고 있을때 Recipe 서비스 실행시 이상 없음  
   ![image](https://user-images.githubusercontent.com/12531980/106556204-5f007d00-6562-11eb-8087-e0260a54d7bd.png)
-  - Order 서비스를 내림
+  - Order 서비스를 내림  
   ![image](https://user-images.githubusercontent.com/12531980/106555946-e699bc00-6561-11eb-81de-15ea39698d35.png)
-  - Recipe 서비스를 실행하여도 이상 없이 동작
+  - Recipe 서비스를 실행하여도 이상 없이 동작  
   ![image](https://user-images.githubusercontent.com/12531980/106556261-7ccde200-6562-11eb-82d1-cd38eb3075fe.png)
 
 ## CQRS
-viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.
+viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.  
 ![image](https://user-images.githubusercontent.com/12531980/106536654-3c5b6d80-653c-11eb-8c20-2853c1743a12.png)
 
 
