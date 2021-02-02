@@ -576,7 +576,7 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 ```
 kubectl create configmap deliveryword --from-literal=word=Preparing
 ```  
-- Configmap 생성 확인
+- Configmap 생성 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106593940-c505f800-6594-11eb-9284-8e896b531f04.png)
 
 - 소스 수정에 따른 Docker 이미지 변경이 필요하기에, 기존 Delivery 서비스 삭제
@@ -590,7 +590,7 @@ kubectl delete pod,deploy,service delivery
 // delivery.setStatus("\"+process.env.delivery_status+ \"");
 delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
 ```
-- Delivery 서비스의 Deployment.yaml 파일에 아래 항목 추가 (아래 코드와 그림은 동일 내용)
+- Delivery 서비스의 Deployment.yml 파일에 아래 항목 추가하여 deployment_configmap.yml 생성 (아래 코드와 그림은 동일 내용)
 ```
           env:
             - name: STATUS
@@ -602,9 +602,17 @@ delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
 ```  
   ![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)  
 - Docker Image 다시 빌드하고, Repository에 배포하기
+- Kubernetes에서 POD 생성할 때, 설정한 deployment_configmap.yml 파일로 생성하기
+```
+kubectl create -f deployment_config.yml
+``` 
 - Kubernetes에서 POD 생성 후 expose
-- 해당 POD에 접속하여 Configmap 항목이 ENV에 있는지 확인
-
+- 해당 POD에 접속하여 Configmap 항목이 ENV에 있는지 확인  
+  ![image](https://user-images.githubusercontent.com/16534043/106595482-faabe080-6596-11eb-9a73-f66fb5d61382.png)
+- http로 전송 후, Status에 Configmap의 Key값이 찍히는지 확인
+```
+http post http://20.194.26.128:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
+``` 
 
 
 
