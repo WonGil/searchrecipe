@@ -572,17 +572,25 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 - yaml 파일로 만들어서 붙이기
 ## ConfigMap 적용
 - ConfigMap을 활용하여 변수를 서비스에 이식한다.
+- ConfigMap 생성하기
+```
+kubectl create configmap deliveryword --from-literal=word=Preparing
+```  
+- Configmap 생성 확인
+  ![image](https://user-images.githubusercontent.com/16534043/106593940-c505f800-6594-11eb-9284-8e896b531f04.png)
+
 - 소스 수정에 따른 Docker 이미지 변경이 필요하기에, 기존 Delivery 서비스 삭제
 ```
 kubectl delete pod,deploy,service delivery
 ```
 - Delivery 서비스의 PolicyHandler.java (delivery\src\main\java\searchrecipe) 수정
 ```
-#30번째 줄을 아래와 같이 수정 (기존 항목 주석처리 후, Configmap으로 이식된 환경변수 호출)
+#30번째 줄을 아래와 같이 수정
+#기존 항목 주석처리 후, Configmap으로 이식된 환경변수 호출
 // delivery.setStatus("\"+process.env.delivery_status+ \"");
 delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
 ```
-- Delivery 서비스의 Deployment.yaml 파일에 아래 항목 추가
+- Delivery 서비스의 Deployment.yaml 파일에 아래 항목 추가 (아래 코드와 그림은 동일 내용)
 ```
           env:
             - name: STATUS
@@ -592,7 +600,13 @@ delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
                   key: word
 
 ```  
-  ![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)
+  ![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)  
+- Docker Image 다시 빌드하고, Repository에 배포하기
+- Kubernetes에서 POD 생성 후 expose
+- 해당 POD에 접속하여 Configmap 항목이 ENV에 있는지 확인
+
+
+
 
 ## Secret 적용
 - secret 적용
