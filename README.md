@@ -373,7 +373,8 @@ kubectl create deploy gateway --image=skccteam02.azurecr.io/gateway:v1
 kubectl create deploy mypage --image=skccteam02.azurecr.io/mypage:v1
 kubectl get all
 ```
-- Kubectl get all 결과 보여주기
+- Kubectl Deploy 결과 확인
+![image](https://user-images.githubusercontent.com/16534043/106553685-34f88c00-655d-11eb-87cb-e59a6f920a5b.png)
 - Kubernetes에서 서비스 생성하기 (Docker 생성이기에 Port는 8080이며, Gateway는 LoadBalancer로 생성)
 ```
 kubectl expose deploy recipe --type="ClusterIP" --port=8080
