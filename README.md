@@ -613,7 +613,7 @@ kubectl create -f deployment_config.yml
 ```
 http post http://20.194.26.128:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
 ``` 
-
+  ![image](https://user-images.githubusercontent.com/16534043/106603485-ae19d280-65a1-11eb-9fe5-773e1ad46790.png)
 
 
 ## Secret 적용
