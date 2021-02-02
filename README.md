@@ -397,6 +397,10 @@ kubectl get all
 ```
 kubectl autoscale deploy order --min=1 --max=10 --cpu-percent=15
 ```
+- 오토스케일 아웃 설정 확인
+![image](https://user-images.githubusercontent.com/16534043/106556586-31680380-6563-11eb-94ec-12877e3eefad.png)
+![image](https://user-images.githubusercontent.com/16534043/106556682-63796580-6563-11eb-817f-20376c4fe025.png)
+
 - siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
@@ -407,7 +411,8 @@ siege -c1000 -t120s -r10 --content-type "application/json" 'http://localhost:808
 ```
 kubectl get deploy order -w
 ```
-- 스케일 아웃 결과 표시
+- 스케일 아웃 설정 확인
+
 - siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.
 
 
