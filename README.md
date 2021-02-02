@@ -448,7 +448,7 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 ```
 watch kubectl get all
 ```
-- siege 실행 결과 표시
+- siege 실행 결과 표시  
 ![image](https://user-images.githubusercontent.com/16534043/106560612-a12dbc80-656a-11eb-8213-5a07a0a03561.png)
 - 오토스케일이 되지 않아, siege 성공률이 낮다.
 
@@ -459,7 +459,7 @@ watch kubectl get all
 kubectl exec -it (siege POD 이름) -- /bin/bash
 siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ```
-- siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.
+- siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.  
 ![image](https://user-images.githubusercontent.com/16534043/106560930-3335c500-656b-11eb-8165-bcb066a03f15.png)
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
