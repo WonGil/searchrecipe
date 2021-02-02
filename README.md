@@ -384,7 +384,8 @@ kubectl expose deploy gateway --type="LoadBalancer" --port=8080
 kubectl expose deploy mypage --type="ClusterIP" --port=8080
 kubectl get all
 ```
-- Kubectl get all 결과 보여주기
+- Kubectl Expose 결과 확인
+![image](https://user-images.githubusercontent.com/16534043/106553822-86088000-655d-11eb-9609-6b4912a4a9d9.png)
 - 테스트를 위해서 Kafka zookeeper와 server도 별도로 실행 필요
 - deployment.yaml 편집 후 배포 방안 적어두기
 ## 무정지 재배포
