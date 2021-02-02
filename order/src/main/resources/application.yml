@@ -69,4 +69,4 @@ spring:
 
 api:
   delivery:
-    url: http://localhost:8080
+    url: http://delivery:8080

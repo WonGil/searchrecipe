@@ -1,4 +1,3 @@
-
 package searchrecipe;
 
 public class MaterialOrdered extends AbstractEvent {
@@ -6,6 +5,8 @@ public class MaterialOrdered extends AbstractEvent {
     private Long id;
     private String materialNm;
     private Integer qty;
+    private String recipeNm;
+    private String cookingMethod;
 
     public Long getId() {
         return id;
@@ -27,5 +28,19 @@ public class MaterialOrdered extends AbstractEvent {
 
     public void setQty(Integer qty) {
         this.qty = qty;
+    }
+    public String getRecipeNm() {
+        return recipeNm;
+    }
+
+    public void setRecipeNm(String recipeNm) {
+        this.recipeNm = recipeNm;
+    }
+    public String getCookingMethod() {
+        return cookingMethod;
+    }
+
+    public void setCookingMethod(String cookingMethod) {
+        this.cookingMethod = cookingMethod;
     }
 }

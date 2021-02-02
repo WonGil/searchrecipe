@@ -14,7 +14,7 @@ public class Recipe {
     private String recipeNm;
     private String cookingMethod;
     private String materialNm;
-    private String qty;
+    private Integer qty;
 
     @PostPersist
     public void onPostPersist(){
@@ -63,11 +63,11 @@ public class Recipe {
     public void setMaterialNm(String materialNm) {
         this.materialNm = materialNm;
     }
-    public String getQty() {
+    public Integer getQty() {
         return qty;
     }
 
-    public void setQty(String qty) {
+    public void setQty(Integer qty) {
         this.qty = qty;
     }
 

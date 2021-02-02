@@ -20,8 +20,15 @@ public class Order {
         Ordered ordered = new Ordered();
         BeanUtils.copyProperties(this, ordered);
         ordered.publishAfterCommit();
+    }
 
-
+    @PrePersist
+    public void onPrePersist(){
+        try {
+            Thread.currentThread().sleep((long) (800 + Math.random() * 220));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @PreRemove
@@ -35,6 +42,8 @@ public class Order {
 
         searchrecipe.external.Cancellation cancellation = new searchrecipe.external.Cancellation();
         // mappings goes here
+        cancellation.setOrderId(this.getId());
+        cancellation.setStatus("Delivery Cancelled");
         OrderApplication.applicationContext.getBean(searchrecipe.external.CancellationService.class)
             .cancel(cancellation);
 
