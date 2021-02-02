@@ -449,9 +449,9 @@ siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
 - Readiness가 설정되지 않은 yml 파일로 배포 진행  
 ![image](https://user-images.githubusercontent.com/16534043/106564492-a261e800-6570-11eb-9b2b-31fca5350825.png)
 ```
-kubectl apply -f deployment_without_readiness.yml```
+kubectl apply -f deployment_without_readiness.yml
 ```
-- Kubernetes가 준비가 되지 않은 delivery pod에 요청을 보내서 siege의 Availability 가 100% 미만으로 떨어짐
+- 아래 그림과 같이, Kubernetes가 준비가 되지 않은 delivery pod에 요청을 보내서 siege의 Availability 가 100% 미만으로 떨어짐
 - 중간에 socket에 끊겨서 siege 명령어 종료됨 (서비스 정지 발생)  
 ![image](https://user-images.githubusercontent.com/16534043/106564722-fb318080-6570-11eb-92d5-181e50772e8b.png)
 - seige 로 배포작업 직전에 워크로드를 모니터링
