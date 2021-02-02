@@ -319,19 +319,13 @@ viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.
 
 # 운영
 ## CI/CD 설정
-- root 폴더 하위에 폴더 만들기
-```
-cd ~
-mkdir gitsource
-cd gitsource
-```
 - git에서 소스 가져오기
 ```
 git clone http://github.com/WonGil/searchrecipe
 ```
 - Build 하기
 ```
-cd ~/gitsource/searchrecipe
+cd /searchrecipe
 cd recipe
 mvn package
 
@@ -353,7 +347,7 @@ mvn package
 ```
 - Dockerlizing, ACR(Azure Container Registry에 Docker Image Push하기
 ```
-cd ~/gitsource/searchrecipe
+cd /searchrecipe
 cd recipe
 az acr build --registry skccteam02 --image skccteam02.azurecr.io/recipe:v1 .
 
