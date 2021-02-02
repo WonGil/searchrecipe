@@ -540,6 +540,15 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 - siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.  
 ![image](https://user-images.githubusercontent.com/16534043/106560930-3335c500-656b-11eb-8165-bcb066a03f15.png)
 
+## Self-healing (Liveness Probe)
+- delivery 시스템 yml 파일의 liveness probe 설정을 바꾸어서, liveness probe가 동작함을 확인
+- liveness probe 가 체크하는 포트를 8080이 아닌, 8090으로 변경  
+![image](https://user-images.githubusercontent.com/16534043/106566581-d38fe780-6573-11eb-9433-1eb65a8a0050.png)
+- delivery에 liveness가 적용된 것을 확인  
+![image](https://user-images.githubusercontent.com/16534043/106566682-f7ebc400-6573-11eb-8452-ed693bdf1f17.png)
+- delivery에 liveness가 발동되어 Restart가 발생함   
+![image](https://user-images.githubusercontent.com/16534043/106566789-210c5480-6574-11eb-8e71-ae11755e274f.png)
+
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 - istio 사용 (Destination Rule)
 - Retry 적용
