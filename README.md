@@ -248,7 +248,7 @@ server:
 ## 유비쿼터스 랭귀지
 - 조직명, 서비스 명에서 사용되고, 업무현장에서도 쓰이며, 모든 이해관계자들이 직관적으로 의미를 이해할 수 있도록 영어 단어를 사용함 (recipe, order, delivery 등)
 
-## 동기식 호출과 Fallback 처리
+## 동기식 호출(Req/Res 방식)과 Fallback 처리
 - 분석단계에서의 조건 중 하나로 주문 취소(order)와 배송 취소(delivery) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하기로 하였다. 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다.
 - 배송 취소 서비스를 호출하기 위하여 FeignClient를 이용하여 Service 대행 인터페이스(Proxy)를 구현
 ```java
@@ -294,7 +294,7 @@ public class Order {
     //...
 }
 ```
-- 동기식 출에서는 호출 시간에 따른 타임 커플링이 발생하여, 주문 취소 시스템에 장애가 나면 배송도 취소되지 않는다는 것을 확인
+- 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하여, 주문 취소 시스템에 장애가 나면 배송도 취소되지 않는다는 것을 확인
 
   - 배송(Delivery) 서비스를 잠시 내려놓음 (ctrl+c)
   ![image](https://user-images.githubusercontent.com/12531980/106551276-425f4780-6558-11eb-87d0-db00d11f70cb.png)
@@ -302,13 +302,65 @@ public class Order {
   - 주문 취소(cancel) 요청 및 에러 난 화면 표시
   ![image]](https://user-images.githubusercontent.com/12531980/106551103-da106600-6557-11eb-8609-4593a0b7d8c2.png)
 
-  - 배송(Delivery) 서비스 재기 동 후 다시 주문 취소 요청
+  - 배송(Delivery) 서비스 재기동 후 다시 주문 취소 요청
   ![image](https://user-images.githubusercontent.com/12531980/106551365-6d499b80-6558-11eb-84b7-b454b1df15c8.png)
 
+## 비동기식 호출 (Pub/Sub 방식)
+- Recipe.java 내에서 아래와 같이 서비스 Pub 구현
+```java
+//...
+public class Recipe {
 
-- 또한 과도한 요청시에 서비스 장애가 도미노 처럼 벌어질 수 있다. (서킷브레이커, 폴백 처리는 운영단계에서 설명한다.)
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
+    private String recipeNm;
+    private String cookingMethod;
+    private String materialNm;
+    private Integer qty;
 
-## 비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트
+    @PostPersist
+    public void onPostPersist(){
+        MaterialOrdered materialOrdered = new MaterialOrdered();
+        BeanUtils.copyProperties(this, materialOrdered);
+        materialOrdered.publishAfterCommit();
+    }
+    //...
+}
+```
+- Order.java 내 Policy Handler 에서 아래와 같이 Sub 구현
+```java
+//...
+@Service
+public class PolicyHandler{
+
+    //...
+    @Autowired
+    OrderRepository orderRepository;
+
+    //...
+    @StreamListener(KafkaProcessor.INPUT)
+    public void wheneverMaterialOrdered_Order(@Payload MaterialOrdered materialOrdered){
+
+        if(materialOrdered.isMe()){
+            System.out.println("##### listener  : " + materialOrdered.toJson());
+            Order order = new Order();
+            order.setMaterialNm(materialOrdered.getMaterialNm());
+            order.setQty(materialOrdered.getQty());
+            order.setStatus("Received Order");
+            orderRepository.save(order);
+        }
+    }
+}
+```
+- 비동기식 호출은 다른 서비스가 비정상이여도 이상없이 동작가능하여, 주문 서비스에 장애가 나도 레시피 서비스는 정상 동작을 확인
+  - Recipe 서비스와 Order 서비스가 둘 다 동시에 돌아가고 있을때 Recipe 서비스 실행시 이상 없음
+  ![image](https://user-images.githubusercontent.com/12531980/106556204-5f007d00-6562-11eb-8087-e0260a54d7bd.png)
+  - Order 서비스를 내림
+  ![image](https://user-images.githubusercontent.com/12531980/106555946-e699bc00-6561-11eb-81de-15ea39698d35.png)
+  - Recipe 서비스를 실행하여도 이상 없이 동작
+  ![image](https://user-images.githubusercontent.com/12531980/106556261-7ccde200-6562-11eb-82d1-cd38eb3075fe.png)
+
 ## CQRS
 viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.
 ![image](https://user-images.githubusercontent.com/12531980/106536654-3c5b6d80-653c-11eb-8c20-2853c1743a12.png)
