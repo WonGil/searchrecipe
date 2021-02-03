@@ -427,6 +427,10 @@ cd mypage
 az acr build --registry skccteam02 --image skccteam02.azurecr.io/mypage:v1 .
 ```
 
+- ACR에 정상적으로 push되었음을 확인   
+  ![image](https://user-images.githubusercontent.com/16534043/106696222-95e89880-661f-11eb-939a-1604a760c967.png)
+
+
 - ACR에서 이미지 가져와서 Kubernetes에서 Deploy하기
 ```
 kubectl create deploy recipe --image=skccteam02.azurecr.io/recipe:v1
