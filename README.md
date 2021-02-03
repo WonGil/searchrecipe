@@ -740,8 +740,12 @@ kubectl create -f deployment_config.yml
 - 해당 POD에 접속하여 Configmap 항목이 ENV에 있는지 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106595482-faabe080-6596-11eb-9a73-f66fb5d61382.png)
 
-- http로 전송 후, Status에 Configmap의 Key값이 찍히는지 확인
+- http로 전송 후, Status에 Configmap의 Key값이 찍히는지 확인  
 ```
 http post http://20.194.26.128:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
-``` 
+```  
   ![image](https://user-images.githubusercontent.com/16534043/106603485-ae19d280-65a1-11eb-9fe5-773e1ad46790.png)
+  
+- 참고: 기존에 configmap 사용 전에는 아래와 같이 status에 고정값이 출력됨  
+  ![image](https://user-images.githubusercontent.com/16534043/106688731-fe307d80-6611-11eb-936f-61739006af67.png)
+
