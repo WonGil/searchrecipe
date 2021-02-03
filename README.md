@@ -565,16 +565,95 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
   ![image](https://user-images.githubusercontent.com/16534043/106566789-210c5480-6574-11eb-8e71-ae11755e274f.png)
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
-- istio 사용 (Destination Rule)
-- Retry 적용
-- Pool Ejection
+- istio를 활용하여 Circuit Breaker 동작을 확인한다.
+
+- istio injection이 enabled 된 namespace를 생성한다.
+```
+kubectl create namespace istio-test-ns
+kubectl label namespace istio-test-ns istio-injection=enabled
+```  
+
+- namespace label에 istio-injection이 enabled 된 것을 확인한다.
+  ![image](https://user-images.githubusercontent.com/16534043/106686154-3b464100-660d-11eb-8a64-f9c1c93b35db.png)
+  
+- 해당 namespace에 기존 서비스들을 재배포한다.
+  (이 명령어로 생성된 pod에 들어가려면 -c 로 컨테이너를 지정해줘야 함)
+```
+# kubectl로 deploy 실행 (실행 위치는 상관없음)
+# 이미지 이름과 버전명에 유의
+kubectl create deploy recipe --image=skccteam02.azurecr.io/recipe:v1 -n istio-test-ns
+kubectl create deploy order --image=skccteam02.azurecr.io/order:v1 -n istio-test-ns
+kubectl create deploy delivery --image=skccteam02.azurecr.io/delivery:v1 -n istio-test-ns
+kubectl create deploy gateway --image=skccteam02.azurecr.io/gateway:v1 -n istio-test-ns
+kubectl create deploy mypage --image=skccteam02.azurecr.io/mypage:v1 -n istio-test-ns
+kubectl get all
+
+#expose 하기
+# (주의) expose할 때, gateway만 LoadBalancer고, 나머지는 ClusterIP임
+kubectl expose deploy recipe --type="ClusterIP" --port=8080 -n istio-test-ns
+kubectl expose deploy order --type="ClusterIP" --port=8080 -n istio-test-ns
+kubectl expose deploy delivery --type="ClusterIP" --port=8080 -n istio-test-ns
+kubectl expose deploy gateway --type="LoadBalancer" --port=8080 -n istio-test-ns
+kubectl expose deploy mypage --type="ClusterIP" --port=8080 -n istio-test-ns
+```  
+
+- 서비스들이 정상적으로 배포되었고, Container가 2개씩 생성된 것을 확인한다. (1개는 서비스 container, 다른 1개는 Sidecar 형태로 생성된 envoy)
+  ![image](https://user-images.githubusercontent.com/16534043/106686490-b3ad0200-660d-11eb-9473-a779d587f200.png)
+
+- gateway의 External IP를 확인하고, 서비스가 정상 작동함을 확인한다.
+```
+http http://52.231.71.168:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
+```  
+  ![image](https://user-images.githubusercontent.com/16534043/106686560-db9c6580-660d-11eb-86f5-c5f5a1b70352.png)
+
+- Circuit Breaker 설정을 위해 아래와 같은 Destination Rule을 생성한다.
+- Pending Request가 많을수록 오랫동안 쌓인 요청은 Response Time이 증가하게 되므로, 적절한 대기 쓰레드 풀을 적용하기 위해 connection pool을 설정했다.
+```
+kubectl apply -f - <<EOF
+  apiVersion: networking.istio.io/v1alpha3
+  kind: DestinationRule
+  metadata:
+    name: dr-httpbin
+    namespace: istio-test-ns
+  spec:
+    host: gateway
+    trafficPolicy:
+      connectionPool:
+        http:
+          http1MaxPendingRequests: 1
+          maxRequestsPerConnection: 1
+EOF
+```  
+- 설정된 Destinationrule을 확인한다.
+  ![image](https://user-images.githubusercontent.com/16534043/106686837-5cf3f800-660e-11eb-9690-3c6ec926bd8e.png)
+
+- siege를 활용하여 User가 1명인 상황에 대해서 요청을 보낸다. (설정값 c1)
+- siege는 같은 namespace에 생성하고, 해당 pod 안에 들어가서 siege 요청을 실행한다.
+```
+kubectl exec -it siege-5459b87f86-tl584 -c siege -n istio-test-ns -- bin/bash
+siege -c1 -t30S -v --content-type "application/json" 'http://52.231.71.168:8080/recipes POST {"recipeNm": "apple_Juice"}'
+``` 
+- 실행결과를 확인하니, Availability가 높게 나옴을 알 수 있다.
+  ![image](https://user-images.githubusercontent.com/16534043/106687083-d0960500-660e-11eb-9442-f2a4ef3f8da7.png)
+
+
+- 이번에는 User가 2명인 상황에 대해서 요청을 보내고, 결과를 확인한다.
+```
+siege -c2 -t30S -v --content-type "application/json" 'http://52.231.71.168:8080/recipes POST {"recipeNm": "apple_Juice"}'
+``` 
+- Availability가 User가 1명일 때 보다 낮게 나옴을 알 수있다. Circuit Breaker가 동작하여 대기중인 요청을 끊은 것을 알 수 있다.
+  ![image](https://user-images.githubusercontent.com/16534043/106687175-fcb18600-660e-11eb-8b46-c33a88be8694.png)
+
+- User를 더 높게 설정하면 결과를 더 확실하게 알 수 있다. (c10 설정)
+
+
 ## 모니터링, 앨럿팅
-- Kiali 활용
+- 모니터링: istio가 설치될 때, Add-on으로 설치된 Kiali, Jaeger, Grafana로 데이터, 서비스에 대한 모니터링이 가능하다.
+-- Kiali (istio External-IP:20001)
+   ![image](https://user-images.githubusercontent.com/16534043/106687288-31254200-660f-11eb-89d2-61bf7eafa0d9.png)
+
+
 - Jager 활용
-## Canary Deploy
-- istio로 실행
-## 운영 유연성 - Persistence Volume, Persistence Volume Claim 적용
-- yaml 파일로 만들어서 붙이기
 ## ConfigMap 적용
 - ConfigMap을 활용하여 변수를 서비스에 이식한다.
 - ConfigMap 생성하기
@@ -591,8 +670,8 @@ kubectl delete pod,deploy,service delivery
 - Delivery 서비스의 PolicyHandler.java (delivery\src\main\java\searchrecipe) 수정
 ```
 #30번째 줄을 아래와 같이 수정
-#기존 항목 주석처리 후, Configmap으로 이식된 환경변수 호출
-// delivery.setStatus("\"+process.env.delivery_status+ \"");
+#기존에는 Delivery Started라는 고정된 값이 출력되었으나, Configmap에서 가져온 환경변수를 입력받도록 수정
+// delivery.setStatus("Delivery Started");
 delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
 ```
 - Delivery 서비스의 Deployment.yml 파일에 아래 항목 추가하여 deployment_configmap.yml 생성 (아래 코드와 그림은 동일 내용)
@@ -619,11 +698,6 @@ kubectl create -f deployment_config.yml
 http post http://20.194.26.128:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
 ``` 
   ![image](https://user-images.githubusercontent.com/16534043/106603485-ae19d280-65a1-11eb-9fe5-773e1ad46790.png)
-
-
-## Secret 적용
-- secret 적용
-
 
 
 
