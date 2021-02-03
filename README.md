@@ -603,7 +603,7 @@ kubectl create namespace istio-test-ns
 kubectl label namespace istio-test-ns istio-injection=enabled
 ```  
 
-- namespace label에 istio-injection이 enabled 된 것을 확인한다.
+- namespace label에 istio-injection이 enabled 된 것을 확인한다.  
   ![image](https://user-images.githubusercontent.com/16534043/106686154-3b464100-660d-11eb-8a64-f9c1c93b35db.png)
   
 - 해당 namespace에 기존 서비스들을 재배포한다.
@@ -627,13 +627,13 @@ kubectl expose deploy gateway --type="LoadBalancer" --port=8080 -n istio-test-ns
 kubectl expose deploy mypage --type="ClusterIP" --port=8080 -n istio-test-ns
 ```  
 
-- 서비스들이 정상적으로 배포되었고, Container가 2개씩 생성된 것을 확인한다. (1개는 서비스 container, 다른 1개는 Sidecar 형태로 생성된 envoy)
+- 서비스들이 정상적으로 배포되었고, Container가 2개씩 생성된 것을 확인한다. (1개는 서비스 container, 다른 1개는 Sidecar 형태로 생성된 envoy)  
   ![image](https://user-images.githubusercontent.com/16534043/106686490-b3ad0200-660d-11eb-9473-a779d587f200.png)
 
 - gateway의 External IP를 확인하고, 서비스가 정상 작동함을 확인한다.
 ```
 http http://52.231.71.168:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
-```  
+```   
   ![image](https://user-images.githubusercontent.com/16534043/106686560-db9c6580-660d-11eb-86f5-c5f5a1b70352.png)
 
 - Circuit Breaker 설정을 위해 아래와 같은 Destination Rule을 생성한다.
