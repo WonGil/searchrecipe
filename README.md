@@ -367,7 +367,7 @@ public class PolicyHandler{
 viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.
 - MaterialOrdered 수행 후의 mypage  
 ![image](https://user-images.githubusercontent.com/12531980/106606835-ecb18c00-65a5-11eb-85fa-9342cc8bef3d.png)
-- OrderCanceled 수행 후의 mypage
+- OrderCanceled 수행 후의 mypage  
 ![image](https://user-images.githubusercontent.com/12531980/106606970-17034980-65a6-11eb-91e3-55c4e31a7e36.png)
 
 
@@ -377,6 +377,7 @@ viewer를 별도로 구현하여 아래와 같이 view 가 출력된다.
 ```
 git clone http://github.com/WonGil/searchrecipe
 ```
+
 - Build 하기
 ```
 cd /searchrecipe
@@ -399,6 +400,7 @@ cd ..
 cd mypage
 mvn package
 ```
+
 - Dockerlizing, ACR(Azure Container Registry에 Docker Image Push하기
 ```
 cd /searchrecipe
@@ -421,6 +423,7 @@ cd ..
 cd mypage
 az acr build --registry skccteam02 --image skccteam02.azurecr.io/mypage:v1 .
 ```
+
 - ACR에서 이미지 가져와서 Kubernetes에서 Deploy하기
 ```
 kubectl create deploy recipe --image=skccteam02.azurecr.io/recipe:v1
@@ -432,6 +435,7 @@ kubectl get all
 ```
 - Kubectl Deploy 결과 확인  
 ![image](https://user-images.githubusercontent.com/16534043/106553685-34f88c00-655d-11eb-87cb-e59a6f920a5b.png)
+
 - Kubernetes에서 서비스 생성하기 (Docker 생성이기에 Port는 8080이며, Gateway는 LoadBalancer로 생성)
 ```
 kubectl expose deploy recipe --type="ClusterIP" --port=8080
@@ -441,41 +445,53 @@ kubectl expose deploy gateway --type="LoadBalancer" --port=8080
 kubectl expose deploy mypage --type="ClusterIP" --port=8080
 kubectl get all
 ```
+
 - Kubectl Expose 결과 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106554016-e0a1dc00-655d-11eb-8439-f4326cecda5a.png)
+
 - 테스트를 위해서 Kafka zookeeper와 server도 별도로 실행 필요
+
 - deployment.yaml 편집 후 배포 방안 적어두기
+
 ## 무정지 재배포
 - 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
+
 - siege 로 배포작업 직전에 워크로드를 모니터링 함
 ```
 siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
 ```
+
 - Readiness가 설정되지 않은 yml 파일로 배포 진행  
   ![image](https://user-images.githubusercontent.com/16534043/106564492-a261e800-6570-11eb-9b2b-31fca5350825.png)
 ```
 kubectl apply -f deployment_without_readiness.yml
 ```
 - 아래 그림과 같이, Kubernetes가 준비가 되지 않은 delivery pod에 요청을 보내서 siege의 Availability 가 100% 미만으로 떨어짐
+
 - 중간에 socket에 끊겨서 siege 명령어 종료됨 (서비스 정지 발생)  
   ![image](https://user-images.githubusercontent.com/16534043/106564722-fb318080-6570-11eb-92d5-181e50772e8b.png)
+
 - 무정지 재배포 여부 확인 전에, siege 로 배포작업 직전에 워크로드를 모니터링
 ```
 siege -c100 -t60S -r10 -v http get http://delivery:8080/deliveries
 ```
+
 - Readiness가 설정된 yml 파일로 배포 진행  
   ![image](https://user-images.githubusercontent.com/16534043/106564838-22884d80-6571-11eb-8cf1-dd0e53b547d7.png)
 ```
 kubectl apply -f deployment_with_readiness.yml```
 ```
+
 - 배포 중 pod가 2개가 뜨고, 새롭게 띄운 pod가 준비될 때까지, 기존 pod가 유지됨을 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106564937-52375580-6571-11eb-994f-b69acceb64b0.png)  
   ![image](https://user-images.githubusercontent.com/16534043/106565031-75620500-6571-11eb-9028-bd05d8125f04.png)
+
 - siege 가 중단되지 않고, Availability가 높아졌음을 확인하여 무정지 재배포가 됨을 확인함  
   ![image](https://user-images.githubusercontent.com/16534043/106565135-a80bfd80-6571-11eb-943e-b3bd77c519db.png)
 
 ## 오토스케일 아웃
 - 서킷 브레이커는 시스템을 안정되게 운영할 수 있게 해줬지만, 사용자의 요청이 급증하는 경우, 오토스케일 아웃이 필요하다.
+
 - 단, 부하가 제대로 걸리기 위해서, recipe 서비스의 리소스를 줄여서 재배포한다.
 ```
 kubectl apply -f - <<EOF
@@ -508,45 +524,56 @@ kubectl apply -f - <<EOF
                 cpu: 200m
 EOF
 ```
+
 - 다시 expose 해준다.
 ```
 kubectl expose deploy recipe --type="ClusterIP" --port=8080
 
 ```
+
 - recipe 시스템에 replica를 자동으로 늘려줄 수 있도록 HPA를 설정한다. 설정은 CPU 사용량이 15%를 넘어서면 replica를 10개까지 늘려준다.
 ```
 kubectl autoscale deploy recipe --min=1 --max=10 --cpu-percent=15
 ```
+
 - hpa 설정 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106558142-9709bf00-6566-11eb-9340-12959204fee8.png)
+
 - hpa 상세 설정 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106558218-b3a5f700-6566-11eb-9b74-0c93679d2b31.png)
   ![image](https://user-images.githubusercontent.com/16534043/106558245-c0c2e600-6566-11eb-89fe-8a6178e1f976.png)
-- - siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
+
+- siege를 활용해서 워크로드를 2분간 걸어준다. (Cloud 내 siege pod에서 부하줄 것)
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
 siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ```
+
 - 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다.
 ```
 watch kubectl get all
 ```
 - siege 실행 결과 표시  
-  ![image](https://user-images.githubusercontent.com/16534043/106560612-a12dbc80-656a-11eb-8213-5a07a0a03561.png)
+
+![image](https://user-images.githubusercontent.com/16534043/106560612-a12dbc80-656a-11eb-8213-5a07a0a03561.png)
+
 - 오토스케일이 되지 않아, siege 성공률이 낮다.
 
 - 스케일 아웃이 자동으로 되었음을 확인
   ![image](https://user-images.githubusercontent.com/16534043/106560501-75aad200-656a-11eb-99dc-fe585ef7e741.png)
+
 - siege 재실행
 ```
 kubectl exec -it (siege POD 이름) -- /bin/bash
 siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ```
+
 - siege 의 로그를 보아도 전체적인 성공률이 높아진 것을 확인 할 수 있다.  
   ![image](https://user-images.githubusercontent.com/16534043/106560930-3335c500-656b-11eb-8165-bcb066a03f15.png)
 
 ## Self-healing (Liveness Probe)
 - delivery 시스템 yml 파일의 liveness probe 설정을 바꾸어서, liveness probe가 동작함을 확인
+
 - liveness probe 옵션을 추가하되, 서비스 포트가 아닌 8090으로 설정  
 ```
         livenessProbe:
@@ -561,6 +588,7 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 
 - delivery에 liveness가 적용된 것을 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106566682-f7ebc400-6573-11eb-8452-ed693bdf1f17.png)
+
 - delivery에 liveness가 발동되었고, 8090 포트에 응답이 없기에 Restart가 발생함   
   ![image](https://user-images.githubusercontent.com/16534043/106566789-210c5480-6574-11eb-8e71-ae11755e274f.png)
 
@@ -607,6 +635,7 @@ http http://52.231.71.168:8080/recipes recipeNm=apple_Juice cookingMethod=Using_
   ![image](https://user-images.githubusercontent.com/16534043/106686560-db9c6580-660d-11eb-86f5-c5f5a1b70352.png)
 
 - Circuit Breaker 설정을 위해 아래와 같은 Destination Rule을 생성한다.
+
 - Pending Request가 많을수록 오랫동안 쌓인 요청은 Response Time이 증가하게 되므로, 적절한 대기 쓰레드 풀을 적용하기 위해 connection pool을 설정했다.
 ```
 kubectl apply -f - <<EOF
@@ -624,42 +653,52 @@ kubectl apply -f - <<EOF
           maxRequestsPerConnection: 1
 EOF
 ```  
+
 - 설정된 Destinationrule을 확인한다.
   ![image](https://user-images.githubusercontent.com/16534043/106686837-5cf3f800-660e-11eb-9690-3c6ec926bd8e.png)
 
 - siege를 활용하여 User가 1명인 상황에 대해서 요청을 보낸다. (설정값 c1)
+
 - siege는 같은 namespace에 생성하고, 해당 pod 안에 들어가서 siege 요청을 실행한다.
 ```
 kubectl exec -it siege-5459b87f86-tl584 -c siege -n istio-test-ns -- bin/bash
 siege -c1 -t30S -v --content-type "application/json" 'http://52.231.71.168:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ``` 
+
 - 실행결과를 확인하니, Availability가 높게 나옴을 알 수 있다.
   ![image](https://user-images.githubusercontent.com/16534043/106687083-d0960500-660e-11eb-9442-f2a4ef3f8da7.png)
-
 
 - 이번에는 User가 2명인 상황에 대해서 요청을 보내고, 결과를 확인한다.
 ```
 siege -c2 -t30S -v --content-type "application/json" 'http://52.231.71.168:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ``` 
+
 - Availability가 User가 1명일 때 보다 낮게 나옴을 알 수있다. Circuit Breaker가 동작하여 대기중인 요청을 끊은 것을 알 수 있다.
   ![image](https://user-images.githubusercontent.com/16534043/106687175-fcb18600-660e-11eb-8b46-c33a88be8694.png)
 
-- User를 더 높게 설정하면 결과를 더 확실하게 알 수 있다. (c10 설정)
-
-
 ## 모니터링, 앨럿팅
 - 모니터링: istio가 설치될 때, Add-on으로 설치된 Kiali, Jaeger, Grafana로 데이터, 서비스에 대한 모니터링이 가능하다.
--- Kiali (istio External-IP:20001)
+
+- Kiali (istio-External-IP:20001)
+  어플리케이션의 proxy 통신, 서비스매쉬를 한눈에 쉽게 확인할 수 있는 모니터링 툴
    ![image](https://user-images.githubusercontent.com/16534043/106687288-31254200-660f-11eb-89d2-61bf7eafa0d9.png)
+   ![image](https://user-images.githubusercontent.com/16534043/106687515-97aa6000-660f-11eb-8cad-2247d1d0c747.png)
+   
+- Jaeger (istio-External-IP:80)
+  트랜잭션을 추적하는 오픈소스로, 이벤트 전체를 파악하는 Tracing 툴
+   ![image](https://user-images.githubusercontent.com/16534043/106687562-b27cd480-660f-11eb-8bb0-0bab4585ece7.png)
+   
+- Grafana (istio-External-IP:3000)
+  시계열 데이터에 대한 대시보드이며, Prometheus를 통해 수집된 istio 관련 데이터를 보여줌
+  ![image](https://user-images.githubusercontent.com/16534043/106687835-451d7380-6610-11eb-9d54-257c3eb4b866.png)
 
-
-- Jager 활용
 ## ConfigMap 적용
 - ConfigMap을 활용하여 변수를 서비스에 이식한다.
 - ConfigMap 생성하기
 ```
 kubectl create configmap deliveryword --from-literal=word=Preparing
 ```  
+
 - Configmap 생성 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106593940-c505f800-6594-11eb-9284-8e896b531f04.png)
 
@@ -667,6 +706,7 @@ kubectl create configmap deliveryword --from-literal=word=Preparing
 ```
 kubectl delete pod,deploy,service delivery
 ```
+
 - Delivery 서비스의 PolicyHandler.java (delivery\src\main\java\searchrecipe) 수정
 ```
 #30번째 줄을 아래와 같이 수정
@@ -674,6 +714,7 @@ kubectl delete pod,deploy,service delivery
 // delivery.setStatus("Delivery Started");
 delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
 ```
+
 - Delivery 서비스의 Deployment.yml 파일에 아래 항목 추가하여 deployment_configmap.yml 생성 (아래 코드와 그림은 동일 내용)
 ```
           env:
@@ -685,20 +726,21 @@ delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
 
 ```  
   ![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)  
+
 - Docker Image 다시 빌드하고, Repository에 배포하기
+
 - Kubernetes에서 POD 생성할 때, 설정한 deployment_configmap.yml 파일로 생성하기
 ```
 kubectl create -f deployment_config.yml
 ``` 
+
 - Kubernetes에서 POD 생성 후 expose
+
 - 해당 POD에 접속하여 Configmap 항목이 ENV에 있는지 확인  
   ![image](https://user-images.githubusercontent.com/16534043/106595482-faabe080-6596-11eb-9a73-f66fb5d61382.png)
+
 - http로 전송 후, Status에 Configmap의 Key값이 찍히는지 확인
 ```
 http post http://20.194.26.128:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
 ``` 
   ![image](https://user-images.githubusercontent.com/16534043/106603485-ae19d280-65a1-11eb-9fe5-773e1ad46790.png)
-
-
-
-
