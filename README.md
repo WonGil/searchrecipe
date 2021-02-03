@@ -1,4 +1,4 @@
-# Search Recipe
+# Recommend Recipe
 
 # 서비스 시나리오
 ## 기능적 요구사항
