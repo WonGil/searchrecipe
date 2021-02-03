@@ -598,6 +598,64 @@ siege -c1000 -t120S -r100 -v --content-type "application/json" 'http://recipe:80
 - delivery에 liveness가 발동되었고, 8090 포트에 응답이 없기에 Restart가 발생함   
   ![image](https://user-images.githubusercontent.com/16534043/106566789-210c5480-6574-11eb-8e71-ae11755e274f.png)
 
+## ConfigMap 적용
+- ConfigMap을 활용하여 변수를 서비스에 이식한다.
+- ConfigMap 생성하기
+```
+kubectl create configmap deliveryword --from-literal=word=Preparing
+```  
+
+- Configmap 생성 확인  
+  ![image](https://user-images.githubusercontent.com/16534043/106593940-c505f800-6594-11eb-9284-8e896b531f04.png)
+
+- 소스 수정에 따른 Docker 이미지 변경이 필요하기에, 기존 Delivery 서비스 삭제
+```
+kubectl delete pod,deploy,service delivery
+```
+
+- Delivery 서비스의 PolicyHandler.java (delivery\src\main\java\searchrecipe) 수정
+```
+#30번째 줄을 아래와 같이 수정
+#기존에는 Delivery Started라는 고정된 값이 출력되었으나, Configmap에서 가져온 환경변수를 입력받도록 수정
+// delivery.setStatus("Delivery Started");
+delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
+```
+
+- Delivery 서비스의 Deployment.yml 파일에 아래 항목 추가하여 deployment_configmap.yml 생성 (아래 코드와 그림은 동일 내용)
+```
+          env:
+            - name: STATUS
+              valueFrom:
+                configMapKeyRef:
+                  name: deliveryword
+                  key: word
+
+```  
+  ![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)  
+
+- Docker Image 다시 빌드하고, Repository에 배포하기
+
+- Kubernetes에서 POD 생성할 때, 설정한 deployment_configmap.yml 파일로 생성하기
+```
+kubectl create -f deployment_config.yml
+``` 
+
+- Kubernetes에서 POD 생성 후 expose
+
+- 해당 POD에 접속하여 Configmap 항목이 ENV에 있는지 확인  
+  ![image](https://user-images.githubusercontent.com/16534043/106595482-faabe080-6596-11eb-9a73-f66fb5d61382.png)
+
+- http로 전송 후, Status에 Configmap의 Key값이 찍히는지 확인  
+```
+http post http://20.194.26.128:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
+```  
+  ![image](https://user-images.githubusercontent.com/16534043/106603485-ae19d280-65a1-11eb-9fe5-773e1ad46790.png)
+  
+- 참고: 기존에 configmap 사용 전에는 아래와 같이 status에 고정값이 출력됨  
+  ![image](https://user-images.githubusercontent.com/16534043/106688731-fe307d80-6611-11eb-936f-61739006af67.png)
+
+
+
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 - istio를 활용하여 Circuit Breaker 동작을 확인한다.
 
@@ -696,60 +754,4 @@ siege -c2 -t30S -v --content-type "application/json" 'http://52.231.71.168:8080/
   - Grafana (istio-External-IP:3000)
   시계열 데이터에 대한 대시보드이며, Prometheus를 통해 수집된 istio 관련 데이터를 보여줌  
   ![image](https://user-images.githubusercontent.com/16534043/106687835-451d7380-6610-11eb-9d54-257c3eb4b866.png)
-
-## ConfigMap 적용
-- ConfigMap을 활용하여 변수를 서비스에 이식한다.
-- ConfigMap 생성하기
-```
-kubectl create configmap deliveryword --from-literal=word=Preparing
-```  
-
-- Configmap 생성 확인  
-  ![image](https://user-images.githubusercontent.com/16534043/106593940-c505f800-6594-11eb-9284-8e896b531f04.png)
-
-- 소스 수정에 따른 Docker 이미지 변경이 필요하기에, 기존 Delivery 서비스 삭제
-```
-kubectl delete pod,deploy,service delivery
-```
-
-- Delivery 서비스의 PolicyHandler.java (delivery\src\main\java\searchrecipe) 수정
-```
-#30번째 줄을 아래와 같이 수정
-#기존에는 Delivery Started라는 고정된 값이 출력되었으나, Configmap에서 가져온 환경변수를 입력받도록 수정
-// delivery.setStatus("Delivery Started");
-delivery.setStatus(" Delivery Status is " + System.getenv("STATUS"));
-```
-
-- Delivery 서비스의 Deployment.yml 파일에 아래 항목 추가하여 deployment_configmap.yml 생성 (아래 코드와 그림은 동일 내용)
-```
-          env:
-            - name: STATUS
-              valueFrom:
-                configMapKeyRef:
-                  name: deliveryword
-                  key: word
-
-```  
-  ![image](https://user-images.githubusercontent.com/16534043/106592668-275df900-6593-11eb-9007-fb31717f34e8.png)  
-
-- Docker Image 다시 빌드하고, Repository에 배포하기
-
-- Kubernetes에서 POD 생성할 때, 설정한 deployment_configmap.yml 파일로 생성하기
-```
-kubectl create -f deployment_config.yml
-``` 
-
-- Kubernetes에서 POD 생성 후 expose
-
-- 해당 POD에 접속하여 Configmap 항목이 ENV에 있는지 확인  
-  ![image](https://user-images.githubusercontent.com/16534043/106595482-faabe080-6596-11eb-9a73-f66fb5d61382.png)
-
-- http로 전송 후, Status에 Configmap의 Key값이 찍히는지 확인  
-```
-http post http://20.194.26.128:8080/recipes recipeNm=apple_Juice cookingMethod=Using_Mixer materialNm=apple qty=3
-```  
-  ![image](https://user-images.githubusercontent.com/16534043/106603485-ae19d280-65a1-11eb-9fe5-773e1ad46790.png)
-  
-- 참고: 기존에 configmap 사용 전에는 아래와 같이 status에 고정값이 출력됨  
-  ![image](https://user-images.githubusercontent.com/16534043/106688731-fe307d80-6611-11eb-936f-61739006af67.png)
 
