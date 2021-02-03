@@ -158,7 +158,7 @@ public class Order {
 
   ![image](https://user-images.githubusercontent.com/12531980/106535000-9c501500-6538-11eb-89be-f5c1078ad4c3.png)
 
-  - 주문 목록 조회
+  - 주문 목록 조회  
   ![image](https://user-images.githubusercontent.com/12531980/106535116-d6b9b200-6538-11eb-8498-46b2d9398b79.png)
 
 ## Gateway 적용
@@ -245,7 +245,7 @@ server:
 ## 폴리그랏 퍼시스턴스
 - recipe의 경우, 다른 마이크로 서비스들과 달리 조회 기능도 제공해야 하기에, HSQL을 사용하여 구현하였다. 이를 통해, 마이크로 서비스 간 서로 다른 종류의 데이터베이스를 사용해도 문제 없이 동작하여 폴리그랏 퍼시스턴스를 충족시켰다.
 
-  **recipe 서비스의 pom.xml**
+  **recipe 서비스의 pom.xml**  
 
   ![image](https://user-images.githubusercontent.com/12531980/106535831-70359380-653a-11eb-8e81-1654226aa9e9.png)
 
@@ -274,6 +274,7 @@ public interface CancellationService {
 
 }
 ```
+
 - 주문이 취소된 직후(@PreRemove) 배송이 취소되도록 처리
 ```java
 //...
@@ -299,6 +300,7 @@ public class Order {
     //...
 }
 ```
+
 - 동기식 호출에서는 호출 시간에 따른 타임 커플링이 발생하여, 주문 취소 시스템에 장애가 나면 배송도 취소되지 않는다는 것을 확인
   - 배송(Delivery) 서비스를 잠시 내려놓음 (ctrl+c)  
   ![image](https://user-images.githubusercontent.com/12531980/106551276-425f4780-6558-11eb-87d0-db00d11f70cb.png)
@@ -330,6 +332,7 @@ public class Recipe {
     //...
 }
 ```
+
 - Order.java 내 Policy Handler 에서 아래와 같이 Sub 구현
 ```java
 //...
@@ -355,6 +358,7 @@ public class PolicyHandler{
     }
 }
 ```
+
 - 비동기식 호출은 다른 서비스가 비정상이여도 이상없이 동작가능하여, 주문 서비스에 장애가 나도 레시피 서비스는 정상 동작을 확인
   - Recipe 서비스와 Order 서비스가 둘 다 동시에 돌아가고 있을때 Recipe 서비스 실행시 이상 없음  
   ![image](https://user-images.githubusercontent.com/12531980/106556204-5f007d00-6562-11eb-8087-e0260a54d7bd.png)
@@ -492,7 +496,7 @@ kubectl apply -f deployment_with_readiness.yml```
 ## 오토스케일 아웃
 - 서킷 브레이커는 시스템을 안정되게 운영할 수 있게 해줬지만, 사용자의 요청이 급증하는 경우, 오토스케일 아웃이 필요하다.
 
-- 단, 부하가 제대로 걸리기 위해서, recipe 서비스의 리소스를 줄여서 재배포한다.
+  - 단, 부하가 제대로 걸리기 위해서, recipe 서비스의 리소스를 줄여서 재배포한다.
 ```
 kubectl apply -f - <<EOF
   apiVersion: apps/v1
@@ -605,7 +609,7 @@ kubectl label namespace istio-test-ns istio-injection=enabled
   ![image](https://user-images.githubusercontent.com/16534043/106686154-3b464100-660d-11eb-8a64-f9c1c93b35db.png)
   
 - 해당 namespace에 기존 서비스들을 재배포한다.
-  (이 명령어로 생성된 pod에 들어가려면 -c 로 컨테이너를 지정해줘야 함)
+  - 이 명령어로 생성된 pod에 들어가려면 -c 로 컨테이너를 지정해줘야 함
 ```
 # kubectl로 deploy 실행 (실행 위치는 상관없음)
 # 이미지 이름과 버전명에 유의
@@ -654,42 +658,41 @@ kubectl apply -f - <<EOF
 EOF
 ```  
 
-- 설정된 Destinationrule을 확인한다.
+- 설정된 Destinationrule을 확인한다.  
   ![image](https://user-images.githubusercontent.com/16534043/106686837-5cf3f800-660e-11eb-9690-3c6ec926bd8e.png)
 
 - siege를 활용하여 User가 1명인 상황에 대해서 요청을 보낸다. (설정값 c1)
-
-- siege는 같은 namespace에 생성하고, 해당 pod 안에 들어가서 siege 요청을 실행한다.
+  - siege는 같은 namespace에 생성하고, 해당 pod 안에 들어가서 siege 요청을 실행한다.
 ```
 kubectl exec -it siege-5459b87f86-tl584 -c siege -n istio-test-ns -- bin/bash
 siege -c1 -t30S -v --content-type "application/json" 'http://52.231.71.168:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ``` 
 
-- 실행결과를 확인하니, Availability가 높게 나옴을 알 수 있다.
+- 실행결과를 확인하니, Availability가 높게 나옴을 알 수 있다.  
   ![image](https://user-images.githubusercontent.com/16534043/106687083-d0960500-660e-11eb-9442-f2a4ef3f8da7.png)
 
-- 이번에는 User가 2명인 상황에 대해서 요청을 보내고, 결과를 확인한다.
+- 이번에는 User가 2명인 상황에 대해서 요청을 보내고, 결과를 확인한다.  
 ```
 siege -c2 -t30S -v --content-type "application/json" 'http://52.231.71.168:8080/recipes POST {"recipeNm": "apple_Juice"}'
 ``` 
 
-- Availability가 User가 1명일 때 보다 낮게 나옴을 알 수있다. Circuit Breaker가 동작하여 대기중인 요청을 끊은 것을 알 수 있다.
+- Availability가 User가 1명일 때 보다 낮게 나옴을 알 수있다. Circuit Breaker가 동작하여 대기중인 요청을 끊은 것을 알 수 있다.  
   ![image](https://user-images.githubusercontent.com/16534043/106687175-fcb18600-660e-11eb-8b46-c33a88be8694.png)
 
 ## 모니터링, 앨럿팅
 - 모니터링: istio가 설치될 때, Add-on으로 설치된 Kiali, Jaeger, Grafana로 데이터, 서비스에 대한 모니터링이 가능하다.
 
-- Kiali (istio-External-IP:20001)
-  어플리케이션의 proxy 통신, 서비스매쉬를 한눈에 쉽게 확인할 수 있는 모니터링 툴
+  - Kiali (istio-External-IP:20001)
+  어플리케이션의 proxy 통신, 서비스매쉬를 한눈에 쉽게 확인할 수 있는 모니터링 툴  
    ![image](https://user-images.githubusercontent.com/16534043/106687288-31254200-660f-11eb-89d2-61bf7eafa0d9.png)
    ![image](https://user-images.githubusercontent.com/16534043/106687515-97aa6000-660f-11eb-8cad-2247d1d0c747.png)
    
-- Jaeger (istio-External-IP:80)
-  트랜잭션을 추적하는 오픈소스로, 이벤트 전체를 파악하는 Tracing 툴
+  - Jaeger (istio-External-IP:80)
+    트랜잭션을 추적하는 오픈소스로, 이벤트 전체를 파악하는 Tracing 툴  
    ![image](https://user-images.githubusercontent.com/16534043/106687562-b27cd480-660f-11eb-8bb0-0bab4585ece7.png)
    
-- Grafana (istio-External-IP:3000)
-  시계열 데이터에 대한 대시보드이며, Prometheus를 통해 수집된 istio 관련 데이터를 보여줌
+  - Grafana (istio-External-IP:3000)
+  시계열 데이터에 대한 대시보드이며, Prometheus를 통해 수집된 istio 관련 데이터를 보여줌  
   ![image](https://user-images.githubusercontent.com/16534043/106687835-451d7380-6610-11eb-9d54-257c3eb4b866.png)
 
 ## ConfigMap 적용
