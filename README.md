@@ -155,7 +155,6 @@ public class Order {
 
 - 적용 후 REST API의 테스트를 통하여 정상적으로 동작하는 것을 확인할 수 있었다.  
   - 주문 수행 (MaterialOrdered)
-
   ![image](https://user-images.githubusercontent.com/12531980/106535000-9c501500-6538-11eb-89be-f5c1078ad4c3.png)
 
   - 주문 목록 조회  
@@ -455,7 +454,6 @@ kubectl get all
 
 - 테스트를 위해서 Kafka zookeeper와 server도 별도로 실행 필요
 
-- deployment.yaml 편집 후 배포 방안 적어두기
 
 ## 무정지 재배포
 - 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscaler 이나 CB 설정을 제거함
